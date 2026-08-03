@@ -42,6 +42,27 @@ MealOps 不是普通菜谱推荐应用，也不是大模型聊天机器人。
 - 应用服务负责用例编排与事务边界；可独立表达的领域规则应与协议层、持久化层解耦。
 - 不创建无明确业务价值的通用基类、抽象层或设计模式。
 
+## 已确认技术基线
+
+- 仓库采用 Monorepo，前后端分离；后端是 package-level modular monolith。
+- 后端使用 Java 21、Spring Boot 4.1.x、Spring MVC 和 Maven。
+- 后端当前只使用一个 Maven `backend` module，不拆 Maven 多业务模块。
+- 数据库使用 PostgreSQL 18，所有 schema 变更使用 Flyway。
+- 持久层使用 MyBatis-Plus 3.5.x Spring Boot 4 starter，但仅用于减少简单 CRUD 样板代码。
+- 禁止用 MyBatis-Plus `IService`、`ServiceImpl` 或 ActiveRecord 作为业务架构。
+- 核心查询、复杂排序、聚合、库存查询和 Planner Candidate 查询必须使用可审查的显式 SQL。
+- 业务 Service 和领域接口不得暴露 MyBatis-Plus Wrapper 或其他持久层框架类型。
+- API 使用 REST、JSON 和 `/api/v1` 前缀；成功响应使用标准 HTTP status，不统一包装 `Result<T>`。
+- 错误响应使用 RFC 9457 Problem Details，并可扩展稳定业务错误码。
+- API 文档使用与 Spring Boot 4 兼容的 springdoc-openapi 3.x。
+- 测试使用 JUnit 5、AssertJ、Spring Boot Test 和 Testcontainers。
+- PostgreSQL、Flyway、Mapper、事务、锁和数据库约束必须使用真实 PostgreSQL 集成测试，不使用 H2 替代。
+- 前端使用 uni-app CLI/Vite、Vue 3、TypeScript 和 Pinia；第一目标为 H5，第二目标为微信小程序。
+- 前端 HTTP Client 封装 `uni.request`，不引入 Axios；大型 UI 组件库暂不选择。
+- 后续认证方向为 Spring Security + Bearer Token/JWT，具体令牌策略必须在认证节点通过 ADR 决定。
+- V1 不引入 Redis、消息队列或 LLM；后续 Agent 预计使用 Spring AI 2.x，并且只能通过 Tool 调用 Application Service。
+- 精确依赖 patch 版本必须在创建工程时验证后固定，不得使用动态版本或仅凭“兼容”声明跳过构建验证。
+
 ## Git 安全规则
 
 - 未经用户明确要求，不得自动执行 `git commit`。

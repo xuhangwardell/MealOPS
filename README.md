@@ -8,9 +8,22 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 
 ## 当前状态
 
-当前仅完成第 0 节点：建立仓库边界、产品范围和 Codex 项目规则。
+当前处于节点 1：技术架构选型。仓库已经固定产品范围、协作规则和 V1 技术架构基线。
 
-仓库目前刻意不包含后端、前端、数据库、容器、依赖或业务代码。下一节点不会自动开始。
+仓库目前仍刻意不包含 `backend/`、`frontend/`、数据库、容器、依赖或业务代码。工程初始化属于后续节点，不会自动开始。
+
+## 当前架构基线
+
+| 类别 | 选择 |
+| --- | --- |
+| 项目形态 | Monorepo、前后端分离、模块化单体 |
+| 后端 | Java 21、Spring Boot 4.1.x、Spring MVC、Maven |
+| 数据 | PostgreSQL 18、MyBatis-Plus Boot 4、核心显式 SQL、Flyway |
+| API | REST/JSON、`/api/v1`、RFC 9457 Problem Details、springdoc 3.x |
+| 测试 | JUnit 5、AssertJ、Spring Boot Test、Testcontainers PostgreSQL |
+| 前端 | uni-app、Vue 3、TypeScript、Pinia、封装 `uni.request` |
+| 运行目标 | 先 H5，后微信小程序 |
+| V1 不引入 | Redis、消息队列、LLM、Agent |
 
 ## 已确定的产品闭环
 
@@ -30,6 +43,12 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 - [MVP 范围](docs/product/mvp-scope.md)
 - [核心用户流程](docs/product/core-user-flow.md)
 - [开发策略决策](docs/decisions/0001-development-strategy.md)
+- [Java 与 Spring 技术栈决策](docs/decisions/0002-java-and-spring-stack.md)
+- [持久层与数据库决策](docs/decisions/0003-persistence-and-database.md)
+- [API 设计决策](docs/decisions/0004-api-design.md)
+- [测试策略决策](docs/decisions/0005-testing-strategy.md)
+- [前端策略决策](docs/decisions/0006-frontend-strategy.md)
+- [V1 系统架构](docs/architecture/system-architecture.md)
 - [Codex 项目规则](AGENTS.md)
 
 ## 开发原则
