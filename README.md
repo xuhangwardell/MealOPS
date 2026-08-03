@@ -8,9 +8,7 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 
 ## 当前状态
 
-当前处于节点 1：技术架构选型。仓库已经固定产品范围、协作规则和 V1 技术架构基线。
-
-仓库目前仍刻意不包含 `backend/`、`frontend/`、数据库、容器、依赖或业务代码。工程初始化属于后续节点，不会自动开始。
+当前已完成节点 2：Engineering Baseline & Backend Scaffold，尚未开始业务节点。仓库已建立最小可执行后端、可复现 Maven Wrapper、本地 PostgreSQL Compose 和真实 PostgreSQL 集成测试，但尚未实现任何业务功能或前端工程。
 
 ## 当前架构基线
 
@@ -20,7 +18,7 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 | 后端 | Java 21、Spring Boot 4.1.x、Spring MVC、Maven |
 | 数据 | PostgreSQL 18、MyBatis-Plus Boot 4、核心显式 SQL、Flyway |
 | API | REST/JSON、`/api/v1`、RFC 9457 Problem Details、springdoc 3.x |
-| 测试 | JUnit 5、AssertJ、Spring Boot Test、Testcontainers PostgreSQL |
+| 测试 | JUnit Jupiter 6、AssertJ、Spring Boot Test、Testcontainers PostgreSQL |
 | 前端 | uni-app、Vue 3、TypeScript、Pinia、封装 `uni.request` |
 | 运行目标 | 先 H5，后微信小程序 |
 | V1 不引入 | Redis、消息队列、LLM、Agent |
@@ -48,8 +46,39 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 - [API 设计决策](docs/decisions/0004-api-design.md)
 - [测试策略决策](docs/decisions/0005-testing-strategy.md)
 - [前端策略决策](docs/decisions/0006-frontend-strategy.md)
+- [工程版本基线](docs/decisions/0007-engineering-baseline.md)
 - [V1 系统架构](docs/architecture/system-architecture.md)
 - [Codex 项目规则](AGENTS.md)
+
+## 本地开发
+
+前置条件：Java 21 和可用的 Docker Engine。
+
+MealOps 本地 PostgreSQL 默认仅绑定 `127.0.0.1:55432`，映射到容器内部标准端口 `5432`，用于避免常见的本机 PostgreSQL `5432` 冲突并限制数据库只供本机访问。需要其他 host port 时可通过 `MEALOPS_DB_PORT` 覆盖；默认启动不需要设置该环境变量，local profile 也会直接连接 `55432`。
+
+从仓库根目录启动 PostgreSQL：
+
+```powershell
+docker compose -f infra/compose.yaml up -d
+```
+
+进入 `backend` 后执行测试：
+
+```powershell
+.\mvnw.cmd test
+.\mvnw.cmd verify
+```
+
+显式启用 local profile 启动后端：
+
+```powershell
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
+```
+
+启动后可检查：
+
+- `GET http://localhost:8080/actuator/health`
+- `GET http://localhost:8080/v3/api-docs`
 
 ## 开发原则
 
@@ -63,4 +92,4 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 
 后续总体顺序为：产品闭环 → 确定性后端 → 规划器 → H5 前端 → Agent → 工程增强。
 
-具体技术选型、领域模型和工程初始化仍需在对应节点确认。本仓库当前没有可运行的应用或测试命令。
+具体领域模型和业务能力仍需在后续对应节点确认；节点 2 不创建业务表、业务 API 或前端实现。

@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: mealops
+  flyway:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

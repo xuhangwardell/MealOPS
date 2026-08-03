@@ -1,0 +1,22 @@
+name: mealops
+
+services:
+  postgres:
+    image: postgres:18.4
+    environment:
+      POSTGRES_DB: ${MEALOPS_DB_NAME:-mealops}
+      POSTGRES_USER: ${MEALOPS_DB_USERNAME:-mealops}
+      POSTGRES_PASSWORD: ${MEALOPS_DB_PASSWORD:-mealops}
+    ports:
+      - "127.0.0.1:${MEALOPS_DB_PORT:-55432}:5432"
+    volumes:
+      - mealops-postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  mealops-postgres-data:

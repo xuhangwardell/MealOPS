@@ -55,7 +55,7 @@ MealOps 不是普通菜谱推荐应用，也不是大模型聊天机器人。
 - API 使用 REST、JSON 和 `/api/v1` 前缀；成功响应使用标准 HTTP status，不统一包装 `Result<T>`。
 - 错误响应使用 RFC 9457 Problem Details，并可扩展稳定业务错误码。
 - API 文档使用与 Spring Boot 4 兼容的 springdoc-openapi 3.x。
-- 测试使用 JUnit 5、AssertJ、Spring Boot Test 和 Testcontainers。
+- 测试使用 Spring Boot 4.1 管理的 JUnit Jupiter 6、AssertJ、Spring Boot Test 和 Testcontainers。
 - PostgreSQL、Flyway、Mapper、事务、锁和数据库约束必须使用真实 PostgreSQL 集成测试，不使用 H2 替代。
 - 前端使用 uni-app CLI/Vite、Vue 3、TypeScript 和 Pinia；第一目标为 H5，第二目标为微信小程序。
 - 前端 HTTP Client 封装 `uni.request`，不引入 Axios；大型 UI 组件库暂不选择。

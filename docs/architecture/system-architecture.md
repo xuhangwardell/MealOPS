@@ -106,7 +106,7 @@ MealOPS/
 | API | REST + JSON + `/api/v1` |
 | 错误 | RFC 9457 Problem Details + 稳定业务 `code` |
 | 文档 | springdoc-openapi 3.x |
-| 测试 | JUnit 5 + AssertJ + Spring Boot Test + Testcontainers |
+| 测试 | JUnit Jupiter 6 + AssertJ + Spring Boot Test + Testcontainers |
 | 认证方向 | Spring Security + Bearer Token/JWT，后续节点设计 |
 
 精确依赖 patch 版本只在创建工程时按官方兼容矩阵验证并固定，不在本文中声明动态依赖版本。

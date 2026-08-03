@@ -6,6 +6,10 @@
 - 决策日期：2026-08-03
 - 适用阶段：V1
 
+### Amendment：节点 2 精确依赖修正
+
+节点 1 将测试框架概括为 JUnit 5。节点 2 在创建可执行工程并核验 Spring Boot 4.1.0 BOM 后，确认其管理的测试基线已经是 JUnit Jupiter 6。因此 MealOps 跟随 Spring Boot dependency management 使用 JUnit Jupiter 6，不额外固定旧版 JUnit。该修正只更新精确工具版本，不改变纯单元测试、Spring 集成测试和真实 PostgreSQL 集成测试的分层策略。
+
 ## Background
 
 MealOps 的主要风险不只来自普通 CRUD，还包括单位精度、份数缩放、库存跨批次分配、事务回滚、乐观锁、幂等、数据库约束、复杂 SQL 和多餐规划排序。测试策略必须把纯业务算法与框架、数据库行为分开验证。
@@ -16,7 +20,7 @@ MealOps 的主要风险不只来自普通 CRUD，还包括单位精度、份数�
 
 ### 测试工具
 
-- 使用 JUnit 5 作为测试框架；
+- 使用 Spring Boot 4.1 管理的 JUnit Jupiter 6 作为测试框架；
 - 使用 AssertJ 编写可读断言；
 - 使用 Spring Boot Test 进行需要 Spring 容器的集成测试；
 - 使用 Testcontainers 启动真实 PostgreSQL 18；
@@ -111,7 +115,8 @@ H2 即使启用兼容模式，也不能等价模拟 PostgreSQL 的所有类型�
 - 本地没有可用容器运行时的开发者无法执行完整数据库测试；
 - 需要维护测试数据构造器和稳定的并发测试方法；
 - 测试层次多于单一 `@SpringBootTest`，开发者必须判断正确测试边界；
-- 当前还没有工程，具体 Maven 命令、CI 并行策略、覆盖率阈值和测试分类命名属于“待确认”。
+- 当前已经确定 `*Test.java` 由 Maven Surefire Plugin 在 `test` phase 运行，`*IT.java` 由 Maven Failsafe Plugin 在 `verify` phase 运行；
+- CI 并行策略、覆盖率指标、测试反馈时长目标和更细的流水线分层策略仍待后续确定。
 
 ## Revisit Conditions
 
