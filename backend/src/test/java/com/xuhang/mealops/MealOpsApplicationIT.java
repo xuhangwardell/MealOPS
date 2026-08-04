@@ -13,15 +13,13 @@ import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.testcontainers.postgresql.PostgreSQLContainer;
+
+import com.xuhang.mealops.support.PostgresTestConfiguration;
 
 @SpringBootTest
-@Import(MealOpsApplicationIT.ContainerConfiguration.class)
+@Import(PostgresTestConfiguration.class)
 class MealOpsApplicationIT {
 
     @Autowired
@@ -47,13 +45,4 @@ class MealOpsApplicationIT {
         }
     }
 
-    @TestConfiguration(proxyBeanMethods = false)
-    static class ContainerConfiguration {
-
-        @Bean
-        @ServiceConnection
-        PostgreSQLContainer postgresqlContainer() {
-            return new PostgreSQLContainer("postgres:18.4");
-        }
-    }
 }

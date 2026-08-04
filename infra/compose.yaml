@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: ${MEALOPS_DB_USERNAME:-mealops}
       POSTGRES_PASSWORD: ${MEALOPS_DB_PASSWORD:-mealops}
     ports:
-      - "127.0.0.1:${MEALOPS_DB_PORT:-55432}:5432"
+      - "127.0.0.1:${MEALOPS_DB_PORT:-15432}:5432"
     volumes:
       - mealops-postgres-data:/var/lib/postgresql
     healthcheck:

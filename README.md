@@ -8,7 +8,7 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 
 ## 当前状态
 
-当前已完成节点 2：Engineering Baseline & Backend Scaffold，尚未开始业务节点。仓库已建立最小可执行后端、可复现 Maven Wrapper、本地 PostgreSQL Compose 和真实 PostgreSQL 集成测试，但尚未实现任何业务功能或前端工程。
+当前已完成节点 3：Canonical Ingredient，正在进行 Code Review。节点 3 是第一个真实业务纵向切片，已实现标准食材身份、名称规范化、持久化和 REST API；尚未开始 Alias、Unit 或其他业务节点。
 
 ## 当前架构基线
 
@@ -47,6 +47,7 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 - [测试策略决策](docs/decisions/0005-testing-strategy.md)
 - [前端策略决策](docs/decisions/0006-frontend-strategy.md)
 - [工程版本基线](docs/decisions/0007-engineering-baseline.md)
+- [标准食材身份与名称规范化](docs/decisions/0008-ingredient-identity-and-normalization.md)
 - [V1 系统架构](docs/architecture/system-architecture.md)
 - [Codex 项目规则](AGENTS.md)
 
@@ -54,7 +55,7 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 
 前置条件：Java 21 和可用的 Docker Engine。
 
-MealOps 本地 PostgreSQL 默认仅绑定 `127.0.0.1:55432`，映射到容器内部标准端口 `5432`，用于避免常见的本机 PostgreSQL `5432` 冲突并限制数据库只供本机访问。需要其他 host port 时可通过 `MEALOPS_DB_PORT` 覆盖；默认启动不需要设置该环境变量，local profile 也会直接连接 `55432`。
+MealOps 本地 PostgreSQL 默认仅绑定 `127.0.0.1:15432`，映射到容器内部标准端口 `5432`，用于避开本机 PostgreSQL `5432` 冲突和 Windows 保留端口并限制数据库只供本机访问。需要其他 host port 时可通过 `MEALOPS_DB_PORT` 覆盖；默认启动不需要设置该环境变量，local profile 也会直接连接 `15432`。
 
 从仓库根目录启动 PostgreSQL：
 

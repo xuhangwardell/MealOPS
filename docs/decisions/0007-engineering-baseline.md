@@ -28,11 +28,12 @@
 ### Local PostgreSQL Port Decision
 
 - PostgreSQL 容器继续监听标准内部端口 5432；
-- MealOps 本地开发默认将宿主机 IPv4 loopback `127.0.0.1:55432` 映射到容器 5432，`application-local.yml` 同样默认连接宿主机 55432；
+- MealOps 本地开发默认将宿主机 IPv4 loopback `127.0.0.1:15432` 映射到容器 5432，`application-local.yml` 同样默认连接宿主机 15432；
 - 数据库只服务本机开发进程，因此 Compose 仅绑定 `127.0.0.1` 以最小化网络暴露，不监听所有 host interface；
 - 开发者可通过 `MEALOPS_DB_PORT` 同时覆盖 Compose host port 和 local datasource port；该变量只覆盖 host port 数字，不改变 loopback 地址或容器内部端口；
 - 原计划使用宿主机默认端口 5432。节点 2 实际验收确认 Windows 本机 PostgreSQL 15 已合法占用 IPv4 5432，发往该端口的请求没有进入 MealOps 容器；
 - 使用 55432 的隔离实验已验证 PostgreSQL 18.4、Hikari、Flyway、Spring Boot、Actuator 和 OpenAPI 均正常；
+- 节点 3 runtime validation 进一步确认 Windows TCP excluded range `55334–55433` 包含 55432，且不修改操作系统保留端口策略；经真实检查确认 15432 未被 excluded、未被占用，因此将当前 local default 调整为 `127.0.0.1:15432 → container:5432`；
 - 该端口决定只适用于本地开发，不改变生产数据库地址或端口设计。
 
 ## Reasons
@@ -42,7 +43,7 @@
 - Spring Boot BOM 提供经过组合验证的依赖集合，避免手工拼接 PostgreSQL、Flyway、测试框架和 Servlet 栈版本；
 - MyBatis-Plus 与 springdoc 不由当前 Boot BOM 提供所需精确版本，因此显式固定并通过真实构建与启动验证；
 - PostgreSQL 18.4 在本地与集成测试中保持一致，可直接验证方言、驱动、Flyway 和数据库主版本；
-- 本地默认使用 55432 可避开常见的本机 PostgreSQL 5432 冲突，使默认 Compose 与 local profile 无需额外环境变量即可协同运行；
+- 本地默认使用 15432 可避开本机 PostgreSQL 5432 冲突和 Windows 当前保留的 55432 区间，使默认 Compose 与 local profile 无需额外环境变量即可协同运行；
 - 最小依赖集合降低首次工程的下载、漏洞面、自动配置和长期升级成本。
 
 ## Alternatives
@@ -54,8 +55,8 @@
 | Maven | Wrapper 3.9.16 | 依赖系统 Maven | 文件更少，无 Wrapper 下载 |
 | 数据库测试 | Testcontainers PostgreSQL 18.4 | H2 | 启动更快，不依赖 Docker |
 | 工程生成 | 审查后的最小手工骨架 | Spring Initializr 默认输出 | 初始化速度快、模板完整 |
-| 本地 PostgreSQL 端口 | host 55432 → container 5432 | 停止本机 PostgreSQL 15 | 可以继续使用 host 5432 |
-| 本地 PostgreSQL 端口 | host 55432 → container 5432 | 每位开发者手工设置端口变量 | 仓库无需选择非默认 host port |
+| 本地 PostgreSQL 端口 | host 15432 → container 5432 | 停止本机 PostgreSQL 15 | 可以继续使用 host 5432 |
+| 本地 PostgreSQL 端口 | host 15432 → container 5432 | 每位开发者手工设置端口变量 | 仓库无需选择非默认 host port |
 | PostgreSQL 内部端口 | container 5432 | 修改容器内部端口 | host 与 container 端口保持相同数字 |
 
 ## Why alternatives were not chosen
@@ -67,6 +68,7 @@
 - 未经审查的 Initializr 输出可能带入当前节点不需要的依赖或配置，本节点文件范围足够小，直接建立最小骨架更易审查；
 - 本机 PostgreSQL 15 是独立且合法的开发服务，MealOps 不应停止或修改它来占用 5432；
 - 强制所有开发者手工设置 `MEALOPS_DB_PORT` 会让默认启动路径不可复现，也容易造成 Compose 与 Spring 配置不一致；
+- 不修改 Windows excluded port range，避免改变宿主机 Hyper-V/WSL/Docker 等系统网络策略；15432 已通过当前环境的 excluded range、listener 和服务占用检查；
 - 修改容器内部标准端口 5432 没有必要，host port 映射已经能隔离冲突，并且保留标准端口更符合镜像和工具默认约定。
 
 ## Trade-offs
@@ -76,7 +78,7 @@
 - Boot BOM 升级可能连带改变多个传递依赖，升级时必须重新执行依赖树、测试和启动检查；
 - Oracle JDK 与参考 Temurin 并非同一发行版，若发现发行版相关差异，需要在两者上复现；
 - 固定 Spring Boot、MyBatis-Plus、springdoc 和 PostgreSQL patch 可复现，但安全修复不会自动进入，必须通过受控升级处理；
-- 本地数据库 URL 使用非默认 host port 55432，开发文档和 IDE 数据库客户端必须明确使用该端口。
+- 本地数据库 URL 使用非默认 host port 15432，开发文档和 IDE 数据库客户端必须明确使用该端口。
 
 ## Revisit Conditions
 
