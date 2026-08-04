@@ -2,15 +2,15 @@
 
 ## 1. 文档目的
 
-本文描述 MealOps V1 当前架构、模块边界、依赖方向和运行关系，并同步至 Node 9 Ingredient Requirement Aggregation 的已实现边界。
+本文描述 MealOps V1 当前架构、模块边界、依赖方向和运行关系，并同步至 Node 10 Shopping List Preview / Inventory Shortage Calculation 的已实现边界。
 
 本文不设计后续业务的数据模型、API 字段或 Planner 算法参数。节点 3 的 Ingredient 细节以 ADR 0008 和对应实现为准，尚未确认的后续细节继续保留到对应节点通过 ADR 决策。
 
 ## 2. V1 Context
 
-当前状态：Node 9 Ingredient Requirement Aggregation 已实现并进入最终审查；流程为 Recipe Selection -> Recipe Scaling -> Ingredient Requirement Aggregation。库存比较、缺口、Shopping、Planner 和 MealPlan 尚未实现。
+当前状态：Node 10 Shopping List Preview / Inventory Shortage Calculation 已实现并进入最终审查；流程为 Recipe -> Recipe Scaling -> Ingredient Requirement Aggregation，加上 Available Inventory -> Shopping List Preview。Shopping List persistence、库存 mutation、MealPlan 和 Planner 尚未实现。
 
-Node 8 在此基础上增加 `InventoryBatch -> FEFO Allocator -> optimistic CAS -> Inventory Transaction Ledger`；Node 9 只在需求侧增加 `Recipe -> RecipeScaler -> Requirement Aggregator`，不访问库存。
+Node 8 在此基础上增加 `InventoryBatch -> FEFO Allocator -> optimistic CAS -> Inventory Transaction Ledger`；Node 9 增加 `Recipe -> RecipeScaler -> Requirement Aggregator`，Node 10 将其与 accounting-available inventory 连接为只读 Shopping List Preview。
 
 MealOps 面向独居用户，根据结构化菜谱、库存批次、保质期、偏好和未来 1～3 天的用餐时间槽，生成多个确定性餐食计划候选。用户确认计划后，系统聚合食材需求、模拟抵扣有效库存、生成购物清单，并在餐食完成、跳过或替换后维护计划和库存状态。
 

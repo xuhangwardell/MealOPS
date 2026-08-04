@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Node 9 Ingredient Requirement Aggregation implemented / under final review。当前只计算菜谱选择的理论食材需求；Inventory comparison、shortage calculation、Shopping List、MealPlan 和 Planner 尚未实现。
+Node 10 Shopping List Preview / Inventory Shortage Calculation implemented / under final review。
 
 新增能力：`Ingredient -> InventoryBatch -> canonical Quantity`。批次保留可为空的 `expiresOn`，并按到期日优先、无到期日置后的确定性顺序返回。
 
@@ -14,9 +14,9 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 
 ## 当前状态
 
-Node 9 Ingredient Requirement Aggregation 已实现并进入最终审查。当前只计算菜谱选择的理论食材需求；Inventory comparison、shortage calculation、Shopping List、MealPlan 和 Planner 尚未实现。
+Node 10 Shopping List Preview / Inventory Shortage Calculation 已实现并进入最终审查。预览只读计算库存覆盖和正缺口，不修改库存、不写流水、不持久化购物清单。
 
-Node 9 Ingredient Requirement Aggregation 已实现并进入最终审查。该节点只计算菜谱选择的理论食材需求，不读取库存、不计算缺口、不生成购物清单。
+当前能力链为 Ingredient Requirement + accounting-available Inventory → Shopping List Preview。food-safety usability policy、MealPlan、Preferences、Planner 和 Node 11 尚未实现。
 
 ## 当前架构基线
 
@@ -62,6 +62,7 @@ Node 9 Ingredient Requirement Aggregation 已实现并进入最终审查。该�
 - [Inventory Batch Foundation](docs/decisions/0012-inventory-batch-foundation.md)
 - [Inventory Consumption and Concurrency](docs/decisions/0013-inventory-consumption-and-concurrency.md)
 - [Ingredient Requirement Aggregation](docs/decisions/0014-ingredient-requirement-aggregation.md)
+- [Shopping List Preview and Inventory Shortage](docs/decisions/0015-shopping-list-preview-and-inventory-shortage.md)
 - [V1 系统架构](docs/architecture/system-architecture.md)
 - [Codex 项目规则](AGENTS.md)
 
