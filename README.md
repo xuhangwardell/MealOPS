@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Node 7 Inventory Batch Foundation 已实现并进入审查。当前支持库存批次创建、读取和可用批次列表；库存消费、调整、流水、锁和 FEFO 扣减属于 Node 8，尚未实现。
+Node 8 Inventory Consumption / FEFO / Transaction Ledger implemented / under review。当前支持确定性 FEFO 消费、批次版本 CAS 和 CONSUME 流水；调整、接收、丢弃、幂等、Shopping 和 Planner 尚未实现。
 
 新增能力：`Ingredient -> InventoryBatch -> canonical Quantity`。批次保留可为空的 `expiresOn`，并按到期日优先、无到期日置后的确定性顺序返回。
 
@@ -14,7 +14,7 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 
 ## 当前状态
 
-Node 7 Inventory Batch Foundation implemented / under final review。当前只支持库存批次创建、读取和可用列表；InventoryTransaction、消费、调整、FEFO、Shopping 和 Planner 尚未实现。
+Node 8 Inventory Consumption / FEFO / Transaction Ledger / Optimistic Concurrency 已实现并进入最终审查。当前支持确定性 FEFO 消费、批次版本 CAS、CONSUME 流水和事务回滚；调整、接收、丢弃、幂等、Shopping 和 Planner 尚未实现。
 
 ## 当前架构基线
 
@@ -58,6 +58,7 @@ Node 7 Inventory Batch Foundation implemented / under final review。当前只�
 - [Structured Recipe Aggregate](docs/decisions/0010-structured-recipe-aggregate.md)
 - [Recipe Scaling](docs/decisions/0011-recipe-scaling.md)
 - [Inventory Batch Foundation](docs/decisions/0012-inventory-batch-foundation.md)
+- [Inventory Consumption and Concurrency](docs/decisions/0013-inventory-consumption-and-concurrency.md)
 - [V1 系统架构](docs/architecture/system-architecture.md)
 - [Codex 项目规则](AGENTS.md)
 

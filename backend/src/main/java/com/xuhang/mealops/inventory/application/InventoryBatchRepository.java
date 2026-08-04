@@ -9,4 +9,6 @@ public interface InventoryBatchRepository {
     Optional<InventoryBatch> findById(Long id);
     List<InventoryBatch> findAvailable();
     List<InventoryBatch> findAvailableByIngredientId(long ingredientId);
+    List<InventoryBatch> findConsumableBatches(long ingredientId, com.xuhang.mealops.measurement.domain.Unit unit);
+    boolean consumeWithVersion(long batchId, java.math.BigDecimal amount, long expectedVersion, String unitCode);
 }

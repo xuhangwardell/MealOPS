@@ -22,6 +22,8 @@ import com.xuhang.mealops.measurement.domain.InvalidQuantityException;
 import com.xuhang.mealops.measurement.domain.IncompatibleUnitException;
 import com.xuhang.mealops.inventory.application.InventoryBatchNotFoundException;
 import com.xuhang.mealops.inventory.domain.InvalidInventoryBatchException;
+import com.xuhang.mealops.inventory.domain.InsufficientInventoryException;
+import com.xuhang.mealops.inventory.domain.InventoryConcurrentModificationException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -65,6 +67,10 @@ public class GlobalProblemDetailHandler {
     ResponseEntity<ProblemDetail> inventoryBatchNotFound(InventoryBatchNotFoundException exception, HttpServletRequest request) {
         return problem(HttpStatus.NOT_FOUND, "Inventory batch not found", exception.getMessage(), "INVENTORY_BATCH_NOT_FOUND", request);
     }
+    @ExceptionHandler(InsufficientInventoryException.class)
+    ResponseEntity<ProblemDetail> insufficient(InsufficientInventoryException e,HttpServletRequest r){return problem(HttpStatus.CONFLICT,"Insufficient inventory",e.getMessage(),"INSUFFICIENT_INVENTORY",r);}
+    @ExceptionHandler(InventoryConcurrentModificationException.class)
+    ResponseEntity<ProblemDetail> concurrent(InventoryConcurrentModificationException e,HttpServletRequest r){return problem(HttpStatus.CONFLICT,"Inventory changed concurrently",e.getMessage(),"INVENTORY_CONCURRENT_MODIFICATION",r);}
 
     @ExceptionHandler({InvalidRecipeException.class, InvalidRecipeScaleException.class, InvalidQuantityException.class,
             IncompatibleUnitException.class, InvalidInventoryBatchException.class})

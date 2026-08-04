@@ -1,0 +1,3 @@
+package com.xuhang.mealops.inventory.infrastructure.persistence;
+import java.util.*; import org.apache.ibatis.annotations.*; import com.xuhang.mealops.inventory.domain.InventoryConsumptionAllocation;
+@Mapper public interface InventoryTransactionMapper { @Insert("INSERT INTO inventory_transaction(transaction_type,ingredient_id,amount,unit_code) VALUES('CONSUME',#{ingredientId},#{amount},#{unit})") @Options(useGeneratedKeys=true,keyProperty="id") int insertHeader(Map<String,Object> h); @Insert("INSERT INTO inventory_transaction_allocation(transaction_id,position,batch_id,amount,before_amount,after_amount) VALUES(#{transactionId},#{position},#{batchId},#{amount},#{before},#{after})") int insertAllocation(Map<String,Object> a); }
