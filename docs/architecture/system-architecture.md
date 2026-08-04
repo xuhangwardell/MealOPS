@@ -2,7 +2,7 @@
 
 ## 1. 文档目的
 
-本文描述节点 1 已确认的 MealOps V1 技术架构、模块边界、依赖方向和运行关系，并同步节点 2 工程基线与节点 3 Canonical Ingredient 的已实现边界。
+本文描述节点 1 已确认的 MealOps V1 技术架构、模块边界、依赖方向和运行关系，并同步节点 2 工程基线、节点 3 Canonical Ingredient 与节点 4 Quantity & Unit Foundation 的已实现边界。
 
 本文不设计后续业务的数据模型、API 字段或 Planner 算法参数。节点 3 的 Ingredient 细节以 ADR 0008 和对应实现为准，尚未确认的后续细节继续保留到对应节点通过 ADR 决策。
 
@@ -133,7 +133,7 @@ MealOPS/
 
 ### 7.2 `ingredient`
 
-节点 3 当前只负责标准食材身份、display name 和 normalized name。别名、单位维度和换算关系属于后续节点，不在当前实现边界内。
+节点 3 当前负责标准食材身份、display name 和 normalized name。节点 4 在独立的 `measurement.domain` 中提供 Recipe、Inventory、Shopping 和 Planner 共用的 Dimension、Unit、Quantity 基础；它不创建持久化表或 API。别名、菜谱、库存和换算业务规则仍属于后续节点。
 
 ### 7.3 `recipe`
 

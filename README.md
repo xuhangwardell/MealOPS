@@ -8,7 +8,7 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 
 ## 当前状态
 
-当前已完成节点 3：Canonical Ingredient，正在进行 Code Review。节点 3 是第一个真实业务纵向切片，已实现标准食材身份、名称规范化、持久化和 REST API；尚未开始 Alias、Unit 或其他业务节点。
+当前已完成节点 3：Canonical Ingredient，并进入节点 4：Quantity & Unit Foundation review。节点 4 已建立 MASS、VOLUME、COUNT 的确定性 Quantity 与同维度单位换算基础；尚未开始 Recipe、Inventory、Shopping 或 Planner。
 
 ## 当前架构基线
 
@@ -48,6 +48,7 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 - [前端策略决策](docs/decisions/0006-frontend-strategy.md)
 - [工程版本基线](docs/decisions/0007-engineering-baseline.md)
 - [标准食材身份与名称规范化](docs/decisions/0008-ingredient-identity-and-normalization.md)
+- [Quantity 与 Unit Domain Foundation](docs/decisions/0009-quantity-unit-foundation.md)
 - [V1 系统架构](docs/architecture/system-architecture.md)
 - [Codex 项目规则](AGENTS.md)
 
