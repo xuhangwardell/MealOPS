@@ -8,7 +8,7 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 
 ## 当前状态
 
-当前已完成节点 5：Structured Recipe Aggregate，并进入 Code Review。MealOps 已将 canonical Ingredient 与 canonical Quantity 组合为可持久化的 Recipe aggregate；尚未开始 Recipe Scaling、Inventory、Shopping 或 Planner。
+当前已完成节点 6：Recipe Scaling，并进入 Code Review。Scaling 是基于 base Recipe 的只读派生结果，不修改或持久化 Recipe；尚未开始 Inventory、Shopping 或 Planner。
 
 ## 当前架构基线
 
@@ -50,6 +50,7 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 - [标准食材身份与名称规范化](docs/decisions/0008-ingredient-identity-and-normalization.md)
 - [Quantity 与 Unit Domain Foundation](docs/decisions/0009-quantity-unit-foundation.md)
 - [Structured Recipe Aggregate](docs/decisions/0010-structured-recipe-aggregate.md)
+- [Recipe Scaling](docs/decisions/0011-recipe-scaling.md)
 - [V1 系统架构](docs/architecture/system-architecture.md)
 - [Codex 项目规则](AGENTS.md)
 

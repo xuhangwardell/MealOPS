@@ -16,8 +16,11 @@ import com.xuhang.mealops.ingredient.application.IngredientNotFoundException;
 import com.xuhang.mealops.ingredient.domain.InvalidIngredientNameException;
 import com.xuhang.mealops.recipe.application.RecipeNotFoundException;
 import com.xuhang.mealops.recipe.domain.InvalidRecipeException;
+import com.xuhang.mealops.recipe.domain.InvalidRecipeScaleException;
 import com.xuhang.mealops.measurement.domain.InvalidQuantityException;
 import com.xuhang.mealops.measurement.domain.IncompatibleUnitException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalProblemDetailHandler {
@@ -55,9 +58,15 @@ public class GlobalProblemDetailHandler {
         return problem(HttpStatus.NOT_FOUND, "Recipe not found", exception.getMessage(), "RECIPE_NOT_FOUND", request);
     }
 
-    @ExceptionHandler({InvalidRecipeException.class, InvalidQuantityException.class, IncompatibleUnitException.class})
+    @ExceptionHandler({InvalidRecipeException.class, InvalidRecipeScaleException.class, InvalidQuantityException.class, IncompatibleUnitException.class})
     ResponseEntity<ProblemDetail> recipeValidation(IllegalArgumentException exception, HttpServletRequest request) {
         return problem(HttpStatus.BAD_REQUEST, "Validation failed", exception.getMessage(), "VALIDATION_FAILED", request);
+    }
+
+    @ExceptionHandler({MissingServletRequestParameterException.class, MethodArgumentTypeMismatchException.class})
+    ResponseEntity<ProblemDetail> protocolValidation(Exception exception, HttpServletRequest request) {
+        return problem(HttpStatus.BAD_REQUEST, "Validation failed", "Request parameter is invalid",
+                "VALIDATION_FAILED", request);
     }
 
     private ResponseEntity<ProblemDetail> problem(HttpStatus status, String title, String detail,

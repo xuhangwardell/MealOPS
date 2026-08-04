@@ -13,7 +13,11 @@ import com.xuhang.mealops.recipe.application.RecipeApplicationService.CreateReci
 @RequestMapping("/api/v1/recipes")
 public class RecipeController {
     private final RecipeApplicationService service;
-    public RecipeController(RecipeApplicationService service) { this.service = service; }
+    private final com.xuhang.mealops.recipe.application.RecipeScalingApplicationService scalingService;
+    public RecipeController(RecipeApplicationService service,
+            com.xuhang.mealops.recipe.application.RecipeScalingApplicationService scalingService) {
+        this.service = service; this.scalingService = scalingService;
+    }
     @PostMapping
     @ApiResponse(responseCode = "201", description = "Recipe created")
     public ResponseEntity<RecipeResponse> create(@Valid @RequestBody CreateRecipeRequest request) {
@@ -24,4 +28,10 @@ public class RecipeController {
     }
     @GetMapping("/{id}")
     public RecipeResponse get(@PathVariable Long id) { return RecipeResponse.from(service.get(id)); }
+
+    @GetMapping("/{id}/scaled")
+    @ApiResponse(responseCode = "200", description = "Scaled recipe")
+    public ScaledRecipeResponse scaled(@PathVariable Long id, @RequestParam int targetServings) {
+        return ScaledRecipeResponse.from(scalingService.scale(id, targetServings));
+    }
 }
