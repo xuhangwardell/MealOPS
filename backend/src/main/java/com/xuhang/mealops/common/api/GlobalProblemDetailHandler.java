@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.xuhang.mealops.ingredient.application.IngredientNameAlreadyExistsException;
 import com.xuhang.mealops.ingredient.application.IngredientNotFoundException;
 import com.xuhang.mealops.ingredient.domain.InvalidIngredientNameException;
+import com.xuhang.mealops.recipe.application.RecipeNotFoundException;
+import com.xuhang.mealops.recipe.domain.InvalidRecipeException;
+import com.xuhang.mealops.measurement.domain.InvalidQuantityException;
+import com.xuhang.mealops.measurement.domain.IncompatibleUnitException;
 
 @RestControllerAdvice
 public class GlobalProblemDetailHandler {
@@ -44,6 +48,16 @@ public class GlobalProblemDetailHandler {
             HttpServletRequest request) {
         return problem(HttpStatus.BAD_REQUEST, "Validation failed", exception.getMessage(),
                 "VALIDATION_FAILED", request);
+    }
+
+    @ExceptionHandler(RecipeNotFoundException.class)
+    ResponseEntity<ProblemDetail> recipeNotFound(RecipeNotFoundException exception, HttpServletRequest request) {
+        return problem(HttpStatus.NOT_FOUND, "Recipe not found", exception.getMessage(), "RECIPE_NOT_FOUND", request);
+    }
+
+    @ExceptionHandler({InvalidRecipeException.class, InvalidQuantityException.class, IncompatibleUnitException.class})
+    ResponseEntity<ProblemDetail> recipeValidation(IllegalArgumentException exception, HttpServletRequest request) {
+        return problem(HttpStatus.BAD_REQUEST, "Validation failed", exception.getMessage(), "VALIDATION_FAILED", request);
     }
 
     private ResponseEntity<ProblemDetail> problem(HttpStatus status, String title, String detail,

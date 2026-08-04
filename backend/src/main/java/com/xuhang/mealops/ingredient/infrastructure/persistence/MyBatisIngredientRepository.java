@@ -2,6 +2,8 @@ package com.xuhang.mealops.ingredient.infrastructure.persistence;
 
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.Collection;
+import java.util.Set;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
@@ -53,6 +55,11 @@ public class MyBatisIngredientRepository implements IngredientRepository {
         } catch (DataIntegrityViolationException exception) {
             throw translateIntegrityViolation(exception);
         }
+    }
+
+    @Override
+    public Set<Long> findExistingIds(Collection<Long> ids) {
+        return ids.isEmpty() ? Set.of() : mapper.findExistingIds(ids);
     }
 
     private RuntimeException translateIntegrityViolation(DataIntegrityViolationException exception) {

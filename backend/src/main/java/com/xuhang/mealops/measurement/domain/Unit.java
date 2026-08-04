@@ -1,6 +1,8 @@
 package com.xuhang.mealops.measurement.domain;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Optional;
 
 public enum Unit {
     GRAM("g", Dimension.MASS, BigDecimal.ONE),
@@ -29,5 +31,20 @@ public enum Unit {
 
     public BigDecimal factorToBase() {
         return factorToBase;
+    }
+
+    public Unit baseUnit() {
+        return switch (dimension) {
+            case MASS -> GRAM;
+            case VOLUME -> MILLILITER;
+            case COUNT -> PIECE;
+        };
+    }
+
+    public boolean isBaseUnit() { return this == baseUnit(); }
+
+    public static Optional<Unit> fromCode(String code) {
+        if (code == null) return Optional.empty();
+        return Arrays.stream(values()).filter(unit -> unit.code.equals(code)).findFirst();
     }
 }
