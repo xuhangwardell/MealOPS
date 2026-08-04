@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -19,6 +20,8 @@ import com.xuhang.mealops.recipe.domain.InvalidRecipeException;
 import com.xuhang.mealops.recipe.domain.InvalidRecipeScaleException;
 import com.xuhang.mealops.measurement.domain.InvalidQuantityException;
 import com.xuhang.mealops.measurement.domain.IncompatibleUnitException;
+import com.xuhang.mealops.inventory.application.InventoryBatchNotFoundException;
+import com.xuhang.mealops.inventory.domain.InvalidInventoryBatchException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -58,9 +61,20 @@ public class GlobalProblemDetailHandler {
         return problem(HttpStatus.NOT_FOUND, "Recipe not found", exception.getMessage(), "RECIPE_NOT_FOUND", request);
     }
 
-    @ExceptionHandler({InvalidRecipeException.class, InvalidRecipeScaleException.class, InvalidQuantityException.class, IncompatibleUnitException.class})
+    @ExceptionHandler(InventoryBatchNotFoundException.class)
+    ResponseEntity<ProblemDetail> inventoryBatchNotFound(InventoryBatchNotFoundException exception, HttpServletRequest request) {
+        return problem(HttpStatus.NOT_FOUND, "Inventory batch not found", exception.getMessage(), "INVENTORY_BATCH_NOT_FOUND", request);
+    }
+
+    @ExceptionHandler({InvalidRecipeException.class, InvalidRecipeScaleException.class, InvalidQuantityException.class,
+            IncompatibleUnitException.class, InvalidInventoryBatchException.class})
     ResponseEntity<ProblemDetail> recipeValidation(IllegalArgumentException exception, HttpServletRequest request) {
         return problem(HttpStatus.BAD_REQUEST, "Validation failed", exception.getMessage(), "VALIDATION_FAILED", request);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ResponseEntity<ProblemDetail> unreadableMessage(HttpMessageNotReadableException exception, HttpServletRequest request) {
+        return problem(HttpStatus.BAD_REQUEST, "Validation failed", "Request body is invalid", "VALIDATION_FAILED", request);
     }
 
     @ExceptionHandler({MissingServletRequestParameterException.class, MethodArgumentTypeMismatchException.class})

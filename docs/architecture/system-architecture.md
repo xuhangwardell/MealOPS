@@ -8,6 +8,8 @@
 
 ## 2. V1 Context
 
+当前状态：Node 7 Inventory Batch Foundation 已实现并进入最终审查。库存批次的创建、读取、canonical Quantity 和 available ordering 已落地；InventoryTransaction、Consumption、Adjustment、FEFO deduction、optimistic locking 和 version 尚未实现。
+
 MealOps 面向独居用户，根据结构化菜谱、库存批次、保质期、偏好和未来 1～3 天的用餐时间槽，生成多个确定性餐食计划候选。用户确认计划后，系统聚合食材需求、模拟抵扣有效库存、生成购物清单，并在餐食完成、跳过或替换后维护计划和库存状态。
 
 V1 的系统边界包括：
@@ -140,6 +142,8 @@ MealOPS/
 负责结构化菜谱、份数、食材用量、步骤、时间、餐次与带饭属性。它引用标准食材，不自行维护另一套食材命名体系。
 
 ### 7.4 `inventory`
+
+Node 7 当前实现 `ingredient -> inventory batch -> canonical Quantity`：库存批次支持创建、读取和可用列表，保留 nullable `expiresOn`，并按到期日优先、无到期日置后的确定性顺序返回。InventoryTransaction、消费、FEFO 扣减、调整、锁和 version 尚未实现，属于 Node 8。
 
 负责库存批次、开封与到期状态、库存分配规则、实际消耗和库存流水。任何真实库存变化都必须可审计。
 

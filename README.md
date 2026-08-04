@@ -1,5 +1,11 @@
 # MealOps
 
+## Current Status
+
+Node 7 Inventory Batch Foundation 已实现并进入审查。当前支持库存批次创建、读取和可用批次列表；库存消费、调整、流水、锁和 FEFO 扣减属于 Node 8，尚未实现。
+
+新增能力：`Ingredient -> InventoryBatch -> canonical Quantity`。批次保留可为空的 `expiresOn`，并按到期日优先、无到期日置后的确定性顺序返回。
+
 MealOps 是面向独居人群的库存感知型多餐规划系统。它根据库存、保质期、烹饪时间、预算、饮食偏好、带饭需求和食材复用等约束，为用户生成未来 1～3 天的多个餐食计划候选，并在确认后形成库存与购物清单闭环。
 
 MealOps 的核心问题不是“这一顿吃什么”，而是：
@@ -8,7 +14,7 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 
 ## 当前状态
 
-当前已完成节点 6：Recipe Scaling，并进入 Code Review。Scaling 是基于 base Recipe 的只读派生结果，不修改或持久化 Recipe；尚未开始 Inventory、Shopping 或 Planner。
+Node 7 Inventory Batch Foundation implemented / under final review。当前只支持库存批次创建、读取和可用列表；InventoryTransaction、消费、调整、FEFO、Shopping 和 Planner 尚未实现。
 
 ## 当前架构基线
 
@@ -51,6 +57,7 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 - [Quantity 与 Unit Domain Foundation](docs/decisions/0009-quantity-unit-foundation.md)
 - [Structured Recipe Aggregate](docs/decisions/0010-structured-recipe-aggregate.md)
 - [Recipe Scaling](docs/decisions/0011-recipe-scaling.md)
+- [Inventory Batch Foundation](docs/decisions/0012-inventory-batch-foundation.md)
 - [V1 系统架构](docs/architecture/system-architecture.md)
 - [Codex 项目规则](AGENTS.md)
 
