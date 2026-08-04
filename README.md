@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Node 10 Shopping List Preview / Inventory Shortage Calculation implemented / under final review。
+Node 11 Planning Preferences Profile implemented / under review。
 
 新增能力：`Ingredient -> InventoryBatch -> canonical Quantity`。批次保留可为空的 `expiresOn`，并按到期日优先、无到期日置后的确定性顺序返回。
 
@@ -14,9 +14,11 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 
 ## 当前状态
 
-Node 10 Shopping List Preview / Inventory Shortage Calculation 已实现并进入最终审查。预览只读计算库存覆盖和正缺口，不修改库存、不写流水、不持久化购物清单。
+Node 10 Shopping List Preview / Inventory Shortage Calculation 已完成。预览只读计算库存覆盖和正缺口，不修改库存、不写流水、不持久化购物清单。
 
-当前能力链为 Ingredient Requirement + accounting-available Inventory → Shopping List Preview。food-safety usability policy、MealPlan、Preferences、Planner 和 Node 11 尚未实现。
+Node 11 Planning Preferences Profile 已实现并进入审查。当前只持久化和读取规划偏好，不将偏好应用于 Recipe 筛选或 Planner。
+
+当前能力链为 Ingredient Requirement + accounting-available Inventory → Shopping List Preview；Planning Preferences → Future Planner。MealPlan、MealSlot、Planner、preference application 和 food-safety usability policy 尚未实现。
 
 ## 当前架构基线
 
@@ -63,6 +65,7 @@ Node 10 Shopping List Preview / Inventory Shortage Calculation 已实现并进�
 - [Inventory Consumption and Concurrency](docs/decisions/0013-inventory-consumption-and-concurrency.md)
 - [Ingredient Requirement Aggregation](docs/decisions/0014-ingredient-requirement-aggregation.md)
 - [Shopping List Preview and Inventory Shortage](docs/decisions/0015-shopping-list-preview-and-inventory-shortage.md)
+- [Planning Preferences Profile](docs/decisions/0016-planning-preferences-profile.md)
 - [V1 系统架构](docs/architecture/system-architecture.md)
 - [Codex 项目规则](AGENTS.md)
 
