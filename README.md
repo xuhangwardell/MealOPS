@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Node 8 Inventory Consumption / FEFO / Transaction Ledger implemented / under review。当前支持确定性 FEFO 消费、批次版本 CAS 和 CONSUME 流水；调整、接收、丢弃、幂等、Shopping 和 Planner 尚未实现。
+Node 9 Ingredient Requirement Aggregation implemented / under final review。当前只计算菜谱选择的理论食材需求；Inventory comparison、shortage calculation、Shopping List、MealPlan 和 Planner 尚未实现。
 
 新增能力：`Ingredient -> InventoryBatch -> canonical Quantity`。批次保留可为空的 `expiresOn`，并按到期日优先、无到期日置后的确定性顺序返回。
 
@@ -14,7 +14,9 @@ MealOps 的核心问题不是“这一顿吃什么”，而是：
 
 ## 当前状态
 
-Node 8 Inventory Consumption / FEFO / Transaction Ledger / Optimistic Concurrency 已实现并进入最终审查。当前支持确定性 FEFO 消费、批次版本 CAS、CONSUME 流水和事务回滚；调整、接收、丢弃、幂等、Shopping 和 Planner 尚未实现。
+Node 9 Ingredient Requirement Aggregation 已实现并进入最终审查。当前只计算菜谱选择的理论食材需求；Inventory comparison、shortage calculation、Shopping List、MealPlan 和 Planner 尚未实现。
+
+Node 9 Ingredient Requirement Aggregation 已实现并进入最终审查。该节点只计算菜谱选择的理论食材需求，不读取库存、不计算缺口、不生成购物清单。
 
 ## 当前架构基线
 
@@ -59,6 +61,7 @@ Node 8 Inventory Consumption / FEFO / Transaction Ledger / Optimistic Concurrenc
 - [Recipe Scaling](docs/decisions/0011-recipe-scaling.md)
 - [Inventory Batch Foundation](docs/decisions/0012-inventory-batch-foundation.md)
 - [Inventory Consumption and Concurrency](docs/decisions/0013-inventory-consumption-and-concurrency.md)
+- [Ingredient Requirement Aggregation](docs/decisions/0014-ingredient-requirement-aggregation.md)
 - [V1 系统架构](docs/architecture/system-architecture.md)
 - [Codex 项目规则](AGENTS.md)
 

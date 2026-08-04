@@ -2,15 +2,15 @@
 
 ## 1. 文档目的
 
-本文描述节点 1 已确认的 MealOps V1 技术架构、模块边界、依赖方向和运行关系，并同步节点 2 工程基线、节点 3 Canonical Ingredient、节点 4 Quantity & Unit Foundation、节点 5 Structured Recipe Aggregate 与节点 6 Recipe Scaling 的已实现边界。
+本文描述 MealOps V1 当前架构、模块边界、依赖方向和运行关系，并同步至 Node 9 Ingredient Requirement Aggregation 的已实现边界。
 
 本文不设计后续业务的数据模型、API 字段或 Planner 算法参数。节点 3 的 Ingredient 细节以 ADR 0008 和对应实现为准，尚未确认的后续细节继续保留到对应节点通过 ADR 决策。
 
 ## 2. V1 Context
 
-当前状态：Node 8 Inventory Consumption / FEFO / Transaction Ledger / Optimistic Concurrency 已实现并进入最终审查。调整、接收、丢弃、幂等、Shopping 和 Planner 尚未实现。
+当前状态：Node 9 Ingredient Requirement Aggregation 已实现并进入最终审查；流程为 Recipe Selection -> Recipe Scaling -> Ingredient Requirement Aggregation。库存比较、缺口、Shopping、Planner 和 MealPlan 尚未实现。
 
-Node 8 在此基础上增加 `InventoryBatch -> FEFO Allocator -> optimistic CAS -> Inventory Transaction Ledger`。调整、接收、丢弃、幂等、Shopping 和 Planner 仍未实现。
+Node 8 在此基础上增加 `InventoryBatch -> FEFO Allocator -> optimistic CAS -> Inventory Transaction Ledger`；Node 9 只在需求侧增加 `Recipe -> RecipeScaler -> Requirement Aggregator`，不访问库存。
 
 MealOps 面向独居用户，根据结构化菜谱、库存批次、保质期、偏好和未来 1～3 天的用餐时间槽，生成多个确定性餐食计划候选。用户确认计划后，系统聚合食材需求、模拟抵扣有效库存、生成购物清单，并在餐食完成、跳过或替换后维护计划和库存状态。
 

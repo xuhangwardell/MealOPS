@@ -24,6 +24,7 @@ import com.xuhang.mealops.inventory.application.InventoryBatchNotFoundException;
 import com.xuhang.mealops.inventory.domain.InvalidInventoryBatchException;
 import com.xuhang.mealops.inventory.domain.InsufficientInventoryException;
 import com.xuhang.mealops.inventory.domain.InventoryConcurrentModificationException;
+import com.xuhang.mealops.requirement.domain.InvalidIngredientRequirementException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -73,7 +74,7 @@ public class GlobalProblemDetailHandler {
     ResponseEntity<ProblemDetail> concurrent(InventoryConcurrentModificationException e,HttpServletRequest r){return problem(HttpStatus.CONFLICT,"Inventory changed concurrently",e.getMessage(),"INVENTORY_CONCURRENT_MODIFICATION",r);}
 
     @ExceptionHandler({InvalidRecipeException.class, InvalidRecipeScaleException.class, InvalidQuantityException.class,
-            IncompatibleUnitException.class, InvalidInventoryBatchException.class})
+            IncompatibleUnitException.class, InvalidInventoryBatchException.class, InvalidIngredientRequirementException.class})
     ResponseEntity<ProblemDetail> recipeValidation(IllegalArgumentException exception, HttpServletRequest request) {
         return problem(HttpStatus.BAD_REQUEST, "Validation failed", exception.getMessage(), "VALIDATION_FAILED", request);
     }
