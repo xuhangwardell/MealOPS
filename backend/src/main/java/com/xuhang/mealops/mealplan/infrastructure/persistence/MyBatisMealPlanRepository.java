@@ -1,0 +1,13 @@
+package com.xuhang.mealops.mealplan.infrastructure.persistence;
+import java.util.*; import org.springframework.stereotype.Repository; import org.springframework.dao.DataIntegrityViolationException;
+import com.xuhang.mealops.mealplan.application.*; import com.xuhang.mealops.mealplan.domain.*;
+@Repository public class MyBatisMealPlanRepository implements MealPlanRepository {
+ private final MealPlanMapper mapper; public MyBatisMealPlanRepository(MealPlanMapper m){mapper=m;}
+ public MealPlan create(MealPlanSchedule s){var p=new MealPlanParent(0,s.startDate(),s.endDate(),"DRAFT");mapper.insertPlan(p);insert(p.getId(),s);return findById(p.getId()).orElseThrow();}
+ public Optional<MealPlan> findById(long id){var p=mapper.findPlan(id);if(p==null)return Optional.empty();var slots=mapper.findSlots(id).stream().map(this::slot).toList();return Optional.of(new MealPlan(p.getId(),MealPlanStatus.valueOf(p.getStatus()),new MealPlanSchedule(p.getStartDate(),p.getEndDate(),slots)));}
+ public MealPlan replaceDraft(long id,MealPlanSchedule s){var p=new MealPlanParent(id,s.startDate(),s.endDate(),"DRAFT");if(mapper.updateDraft(p)!=1)throw new MealPlanStateConflictException("Meal plan state conflict");mapper.deleteSlots(id);insert(id,s);return findById(id).orElseThrow();}
+ public MealPlan confirmDraftIfComplete(long id){int n=mapper.confirm(id);if(n!=1){var p=mapper.findPlan(id);if(p==null)throw new MealPlanNotFoundException(id);if(!"DRAFT".equals(p.getStatus()))throw new MealPlanStateConflictException("Meal plan state conflict");if(mapper.findSlots(id).isEmpty()||mapper.findSlots(id).stream().anyMatch(s->s.recipeId()==null))throw new MealPlanIncompleteException();throw new MealPlanStateConflictException("Meal plan state conflict");}return findById(id).orElseThrow();}
+ public MealPlan cancelActive(long id){if(mapper.cancel(id)!=1){var p=mapper.findPlan(id);if(p==null)throw new MealPlanNotFoundException(id);throw new MealPlanStateConflictException("Meal plan state conflict");}return findById(id).orElseThrow();}
+ private void insert(long id,MealPlanSchedule s){for(var x:s.slots()){var r=x.recipeSelection();mapper.insertSlot(id,x.date(),x.mealType().name(),r==null?null:r.recipeId(),r==null?null:r.targetServings());}}
+ private MealSlot slot(MealSlotRow r){return new MealSlot(r.mealDate(),MealType.valueOf(r.mealType()),r.recipeId()==null?null:new MealPlanRecipeSelection(r.recipeId(),r.targetServings()));}
+}

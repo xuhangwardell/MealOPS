@@ -27,6 +27,10 @@ import com.xuhang.mealops.inventory.domain.InventoryConcurrentModificationExcept
 import com.xuhang.mealops.requirement.domain.InvalidIngredientRequirementException;
 import com.xuhang.mealops.shopping.domain.InvalidShoppingListException;
 import com.xuhang.mealops.planning.domain.InvalidPlanningPreferencesException;
+import com.xuhang.mealops.mealplan.application.MealPlanNotFoundException;
+import com.xuhang.mealops.mealplan.application.MealPlanStateConflictException;
+import com.xuhang.mealops.mealplan.application.MealPlanIncompleteException;
+import com.xuhang.mealops.mealplan.domain.InvalidMealPlanException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -66,6 +70,19 @@ public class GlobalProblemDetailHandler {
         return problem(HttpStatus.NOT_FOUND, "Recipe not found", exception.getMessage(), "RECIPE_NOT_FOUND", request);
     }
 
+    @ExceptionHandler(MealPlanNotFoundException.class)
+    ResponseEntity<ProblemDetail> mealPlanNotFound(MealPlanNotFoundException exception, HttpServletRequest request) {
+        return problem(HttpStatus.NOT_FOUND, "Meal plan not found", exception.getMessage(), "MEAL_PLAN_NOT_FOUND", request);
+    }
+    @ExceptionHandler(MealPlanStateConflictException.class)
+    ResponseEntity<ProblemDetail> mealPlanConflict(MealPlanStateConflictException exception, HttpServletRequest request) {
+        return problem(HttpStatus.CONFLICT, "Meal plan state conflict", exception.getMessage(), "MEAL_PLAN_STATE_CONFLICT", request);
+    }
+    @ExceptionHandler(MealPlanIncompleteException.class)
+    ResponseEntity<ProblemDetail> mealPlanIncomplete(MealPlanIncompleteException exception, HttpServletRequest request) {
+        return problem(HttpStatus.CONFLICT, "Meal plan incomplete", exception.getMessage(), "MEAL_PLAN_INCOMPLETE", request);
+    }
+
     @ExceptionHandler(InventoryBatchNotFoundException.class)
     ResponseEntity<ProblemDetail> inventoryBatchNotFound(InventoryBatchNotFoundException exception, HttpServletRequest request) {
         return problem(HttpStatus.NOT_FOUND, "Inventory batch not found", exception.getMessage(), "INVENTORY_BATCH_NOT_FOUND", request);
@@ -76,7 +93,7 @@ public class GlobalProblemDetailHandler {
     ResponseEntity<ProblemDetail> concurrent(InventoryConcurrentModificationException e,HttpServletRequest r){return problem(HttpStatus.CONFLICT,"Inventory changed concurrently",e.getMessage(),"INVENTORY_CONCURRENT_MODIFICATION",r);}
 
     @ExceptionHandler({InvalidRecipeException.class, InvalidRecipeScaleException.class, InvalidQuantityException.class,
-            IncompatibleUnitException.class, InvalidInventoryBatchException.class, InvalidIngredientRequirementException.class, InvalidShoppingListException.class, InvalidPlanningPreferencesException.class})
+            IncompatibleUnitException.class, InvalidInventoryBatchException.class, InvalidIngredientRequirementException.class, InvalidShoppingListException.class, InvalidPlanningPreferencesException.class, InvalidMealPlanException.class})
     ResponseEntity<ProblemDetail> recipeValidation(IllegalArgumentException exception, HttpServletRequest request) {
         return problem(HttpStatus.BAD_REQUEST, "Validation failed", exception.getMessage(), "VALIDATION_FAILED", request);
     }
