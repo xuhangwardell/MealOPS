@@ -2,9 +2,9 @@
 
 ## Current Status
 
-Node 14 Deterministic Candidate Scoring & Ranking implemented / under review.
+Node 15 Deterministic Multi-Meal Plan Construction implemented / under review.
 
-Node 13 使用 `maxCookingMinutes` 与 `excludedIngredientIds` 执行 hard filtering；Node 14 对 eligible candidates 执行透明、确定性的 soft scoring/ranking。`defaultServings` 第一次用于 Recipe scaling 和 inventory fit 计算。
+Node 13 负责 hard eligibility，Node 14 负责单道 Recipe 的透明 scoring/ranking，Node 15 复用二者并按日期和 MealType 业务顺序逐槽位构建完整 DRAFT MealPlan。每选中一道 Recipe 后，只在请求内的 accounting inventory snapshot 中抵扣其需求并重新排名；真实 Inventory、库存流水和版本均不改变。生成不会自动 Confirm，仍保留显式确认边界。
 
 已实现：
 
@@ -17,16 +17,19 @@ Node 13 使用 `maxCookingMinutes` 与 `excludedIngredientIds` 执行 hard filte
 - recipeId ASC deterministic candidate representation
 - accounting inventory coverage scorecard
 - coverage DESC / shortage count ASC / cooking time ASC / recipeId ASC ranking
+- deterministic greedy multi-meal construction
+- rolling in-memory accounting inventory simulation
+- complete DRAFT MealPlan persistence and explicit confirm lifecycle
 
 尚未实现：
 
 - opaque `totalScore` 或 arbitrary weights（明确不使用）
 - food-safety coverage 或 expiry penalty
-- Planner
-- automatic Recipe selection
+- global optimization、beam search 或 backtracking
+- diversity/repetition penalty 与 MealType suitability
 - Inventory reservation/consumption 或 shopping price optimization
 - COMPLETED workflow
-- Node 15
+- Node 16
 
 Node 11 Planning Preferences 是历史节点，不代表当前状态。
 
@@ -55,6 +58,7 @@ V1 不引入 Redis、消息队列、LLM 或 Agent。
 - [Meal Plan and Meal Slot Lifecycle](docs/decisions/0017-meal-plan-and-slot-lifecycle.md)
 - [Deterministic Recipe Candidate Filtering](docs/decisions/0018-deterministic-recipe-candidate-filtering.md)
 - [Deterministic Candidate Scoring and Ranking](docs/decisions/0019-deterministic-candidate-scoring-and-ranking.md)
+- [Deterministic Multi-Meal Plan Construction](docs/decisions/0020-deterministic-multi-meal-plan-construction.md)
 - [Planning Preferences Profile](docs/decisions/0016-planning-preferences-profile.md)
 - [项目规则](AGENTS.md)
 

@@ -30,7 +30,9 @@ import com.xuhang.mealops.planning.domain.InvalidPlanningPreferencesException;
 import com.xuhang.mealops.mealplan.application.MealPlanNotFoundException;
 import com.xuhang.mealops.mealplan.application.MealPlanStateConflictException;
 import com.xuhang.mealops.mealplan.application.MealPlanIncompleteException;
+import com.xuhang.mealops.mealplan.application.MealPlanNoEligibleRecipeException;
 import com.xuhang.mealops.mealplan.domain.InvalidMealPlanException;
+import com.xuhang.mealops.planning.domain.InvalidMealPlanPlanningException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -82,6 +84,12 @@ public class GlobalProblemDetailHandler {
     ResponseEntity<ProblemDetail> mealPlanIncomplete(MealPlanIncompleteException exception, HttpServletRequest request) {
         return problem(HttpStatus.CONFLICT, "Meal plan incomplete", exception.getMessage(), "MEAL_PLAN_INCOMPLETE", request);
     }
+    @ExceptionHandler(MealPlanNoEligibleRecipeException.class)
+    ResponseEntity<ProblemDetail> noEligibleRecipe(MealPlanNoEligibleRecipeException exception,
+            HttpServletRequest request) {
+        return problem(HttpStatus.CONFLICT, "No eligible Recipe", exception.getMessage(),
+                "MEAL_PLAN_NO_ELIGIBLE_RECIPE", request);
+    }
 
     @ExceptionHandler(InventoryBatchNotFoundException.class)
     ResponseEntity<ProblemDetail> inventoryBatchNotFound(InventoryBatchNotFoundException exception, HttpServletRequest request) {
@@ -93,7 +101,8 @@ public class GlobalProblemDetailHandler {
     ResponseEntity<ProblemDetail> concurrent(InventoryConcurrentModificationException e,HttpServletRequest r){return problem(HttpStatus.CONFLICT,"Inventory changed concurrently",e.getMessage(),"INVENTORY_CONCURRENT_MODIFICATION",r);}
 
     @ExceptionHandler({InvalidRecipeException.class, InvalidRecipeScaleException.class, InvalidQuantityException.class,
-            IncompatibleUnitException.class, InvalidInventoryBatchException.class, InvalidIngredientRequirementException.class, InvalidShoppingListException.class, InvalidPlanningPreferencesException.class, InvalidMealPlanException.class})
+            IncompatibleUnitException.class, InvalidInventoryBatchException.class, InvalidIngredientRequirementException.class, InvalidShoppingListException.class, InvalidPlanningPreferencesException.class, InvalidMealPlanException.class,
+            InvalidMealPlanPlanningException.class})
     ResponseEntity<ProblemDetail> recipeValidation(IllegalArgumentException exception, HttpServletRequest request) {
         return problem(HttpStatus.BAD_REQUEST, "Validation failed", exception.getMessage(), "VALIDATION_FAILED", request);
     }
