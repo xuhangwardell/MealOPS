@@ -25,4 +25,13 @@ public interface RecipeMapper {
 
     @Select("SELECT recipe_id AS recipeId, position, instruction FROM recipe_step WHERE recipe_id = #{id} ORDER BY position")
     List<RecipeStepEntity> findSteps(Long id);
+
+    @Select("SELECT id, name, base_servings AS baseServings, estimated_minutes AS estimatedMinutes FROM recipe ORDER BY id")
+    List<RecipeEntity> findAllRecipes();
+
+    @Select("SELECT recipe_id AS recipeId, ingredient_id AS ingredientId, position, amount, unit_code AS unitCode FROM recipe_ingredient ORDER BY recipe_id, position")
+    List<RecipeIngredientEntity> findAllIngredients();
+
+    @Select("SELECT recipe_id AS recipeId, position, instruction FROM recipe_step ORDER BY recipe_id, position")
+    List<RecipeStepEntity> findAllSteps();
 }

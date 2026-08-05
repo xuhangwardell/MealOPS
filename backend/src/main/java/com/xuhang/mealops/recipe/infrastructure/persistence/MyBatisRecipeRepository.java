@@ -2,6 +2,9 @@ package com.xuhang.mealops.recipe.infrastructure.persistence;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import org.springframework.stereotype.Repository;
 import com.xuhang.mealops.measurement.domain.Quantity;
 import com.xuhang.mealops.measurement.domain.Unit;
@@ -31,5 +34,25 @@ public class MyBatisRecipeRepository implements RecipeRepository {
         }
         var steps = new ArrayList<RecipeStep>(); for (var s : mapper.findSteps(id)) steps.add(new RecipeStep(s.position(), s.instruction()));
         return Optional.of(Recipe.reconstitute(p.getId(), RecipeName.of(p.getName()), p.getBaseServings(), p.getEstimatedMinutes(), lines, steps));
+    }
+
+    @Override public List<Recipe> findAll() {
+        var parents = mapper.findAllRecipes();
+        if (parents.isEmpty()) return List.of();
+        Map<Long, List<RecipeIngredient>> ingredientsByRecipe = new HashMap<>();
+        for (var row : mapper.findAllIngredients()) {
+            Unit unit = Unit.fromCode(row.unitCode()).orElseThrow(() -> new IllegalStateException("Unknown persisted unit: " + row.unitCode()));
+            ingredientsByRecipe.computeIfAbsent(row.recipeId(), ignored -> new ArrayList<>())
+                    .add(RecipeIngredient.of(row.ingredientId(), row.position(), Quantity.of(row.amount(), unit)));
+        }
+        Map<Long, List<RecipeStep>> stepsByRecipe = new HashMap<>();
+        for (var row : mapper.findAllSteps()) {
+            stepsByRecipe.computeIfAbsent(row.recipeId(), ignored -> new ArrayList<>())
+                    .add(new RecipeStep(row.position(), row.instruction()));
+        }
+        return parents.stream().map(parent -> Recipe.reconstitute(parent.getId(), RecipeName.of(parent.getName()),
+                parent.getBaseServings(), parent.getEstimatedMinutes(),
+                ingredientsByRecipe.getOrDefault(parent.getId(), List.of()),
+                stepsByRecipe.getOrDefault(parent.getId(), List.of()))).toList();
     }
 }

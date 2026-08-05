@@ -2,7 +2,7 @@
 
 ## 文档目的
 
-本文档同步至 Node 12：Meal Plan & Meal Slot Lifecycle，记录当前模块边界、依赖方向和运行关系。
+本文档同步至 Node 13：Deterministic Recipe Candidate Filtering，记录当前模块边界、依赖方向和运行关系。
 
 ## 当前架构状态
 
@@ -11,12 +11,18 @@
 ```text
 Planning Preferences
         ↓
+Hard Constraint Filter
+        ↓
+Recipe Candidates
+        ↓
+Future Ranking
+        ↓
 Future Planner
         ↓
-Meal Plan / Meal Slots
+MealPlan
 ```
 
-MealPlan 当前支持手动 API 创建，Recipe 由客户端显式分配；支持 DRAFT 全量替换、Confirm 和 Cancel。Planning Preferences 尚未应用，Planner 尚未实现，Shopping / Inventory 未联动，没有 COMPLETED workflow。
+Node 13 首次应用 Planning Preferences：仅使用 `maxCookingMinutes` 与 `excludedIngredientIds` 进行纯 Java 硬约束过滤。`defaultServings` 不影响 eligibility，Inventory 不参与 hard filtering。Ranking、scoring、Planner、Shopping/Inventory optimization 尚未实现。Node 12 MealPlan 仍可通过手动 API 创建和显式分配 Recipe。
 
 ## 模块与依赖
 

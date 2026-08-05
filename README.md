@@ -2,7 +2,9 @@
 
 ## Current Status
 
-Node 12 Meal Plan & Meal Slot Lifecycle implemented / under final review.
+Node 13 Deterministic Recipe Candidate Filtering implemented / under review.
+
+Node 13 第一次应用 persisted Planning Preferences 的 `maxCookingMinutes` 与 `excludedIngredientIds`，生成确定性的 eligible Recipe candidate set。
 
 已实现：
 
@@ -11,16 +13,17 @@ Node 12 Meal Plan & Meal Slot Lifecycle implemented / under final review.
 - manual Recipe assignment
 - DRAFT full replacement
 - confirm / cancel lifecycle
+- pure hard-constraint Recipe filtering
+- recipeId ASC deterministic candidate representation
 
 尚未实现：
 
-- Planning Preferences application
-- Planner
+- defaultServings eligibility filtering（明确不使用）
+- Ranking / score / Planner
 - automatic Recipe selection
-- Shopping integration
-- Inventory reservation / consumption
+- Inventory hard filtering 或 Shopping optimization
 - COMPLETED workflow
-- Node 13
+- Node 14
 
 Node 11 Planning Preferences 是历史节点，不代表当前状态。
 
@@ -47,6 +50,7 @@ V1 不引入 Redis、消息队列、LLM 或 Agent。
 - [核心用户流程](docs/product/core-user-flow.md)
 - [系统架构](docs/architecture/system-architecture.md)
 - [Meal Plan and Meal Slot Lifecycle](docs/decisions/0017-meal-plan-and-slot-lifecycle.md)
+- [Deterministic Recipe Candidate Filtering](docs/decisions/0018-deterministic-recipe-candidate-filtering.md)
 - [Planning Preferences Profile](docs/decisions/0016-planning-preferences-profile.md)
 - [项目规则](AGENTS.md)
 
