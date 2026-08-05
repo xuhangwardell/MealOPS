@@ -2,9 +2,9 @@
 
 ## Current Status
 
-Node 13 Deterministic Recipe Candidate Filtering implemented / under review.
+Node 14 Deterministic Candidate Scoring & Ranking implemented / under review.
 
-Node 13 第一次应用 persisted Planning Preferences 的 `maxCookingMinutes` 与 `excludedIngredientIds`，生成确定性的 eligible Recipe candidate set。
+Node 13 使用 `maxCookingMinutes` 与 `excludedIngredientIds` 执行 hard filtering；Node 14 对 eligible candidates 执行透明、确定性的 soft scoring/ranking。`defaultServings` 第一次用于 Recipe scaling 和 inventory fit 计算。
 
 已实现：
 
@@ -15,15 +15,18 @@ Node 13 第一次应用 persisted Planning Preferences 的 `maxCookingMinutes` �
 - confirm / cancel lifecycle
 - pure hard-constraint Recipe filtering
 - recipeId ASC deterministic candidate representation
+- accounting inventory coverage scorecard
+- coverage DESC / shortage count ASC / cooking time ASC / recipeId ASC ranking
 
 尚未实现：
 
-- defaultServings eligibility filtering（明确不使用）
-- Ranking / score / Planner
+- opaque `totalScore` 或 arbitrary weights（明确不使用）
+- food-safety coverage 或 expiry penalty
+- Planner
 - automatic Recipe selection
-- Inventory hard filtering 或 Shopping optimization
+- Inventory reservation/consumption 或 shopping price optimization
 - COMPLETED workflow
-- Node 14
+- Node 15
 
 Node 11 Planning Preferences 是历史节点，不代表当前状态。
 
@@ -51,6 +54,7 @@ V1 不引入 Redis、消息队列、LLM 或 Agent。
 - [系统架构](docs/architecture/system-architecture.md)
 - [Meal Plan and Meal Slot Lifecycle](docs/decisions/0017-meal-plan-and-slot-lifecycle.md)
 - [Deterministic Recipe Candidate Filtering](docs/decisions/0018-deterministic-recipe-candidate-filtering.md)
+- [Deterministic Candidate Scoring and Ranking](docs/decisions/0019-deterministic-candidate-scoring-and-ranking.md)
 - [Planning Preferences Profile](docs/decisions/0016-planning-preferences-profile.md)
 - [项目规则](AGENTS.md)
 
