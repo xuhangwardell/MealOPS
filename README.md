@@ -2,9 +2,9 @@
 
 ## Current Status
 
-Node 15 Deterministic Multi-Meal Plan Construction implemented / under review.
+Node 16 Plan-Derived Shopping Preview implemented / under review.
 
-Node 13 负责 hard eligibility，Node 14 负责单道 Recipe 的透明 scoring/ranking，Node 15 复用二者并按日期和 MealType 业务顺序逐槽位构建完整 DRAFT MealPlan。每选中一道 Recipe 后，只在请求内的 accounting inventory snapshot 中抵扣其需求并重新排名；真实 Inventory、库存流水和版本均不改变。生成不会自动 Confirm，仍保留显式确认边界。
+Node 15 生成并持久化完整但尚未确认的 DRAFT MealPlan。Node 16 读取该持久化计划中的 Recipe selections 和各自 stored `targetServings`，先聚合整份计划的食材需求，再与请求时的 current accounting Inventory 比较，生成 live、derived、read-only 的 Shopping Preview。Planning Preferences 后续变化不会改写既有计划的购物需求。
 
 已实现：
 
@@ -20,6 +20,9 @@ Node 13 负责 hard eligibility，Node 14 负责单道 Recipe 的透明 scoring/
 - deterministic greedy multi-meal construction
 - rolling in-memory accounting inventory simulation
 - complete DRAFT MealPlan persistence and explicit confirm lifecycle
+- persisted MealPlan-derived whole-plan requirement aggregation
+- live current-inventory shopping shortage preview
+- complete DRAFT and CONFIRMED preview support
 
 尚未实现：
 
@@ -27,9 +30,11 @@ Node 13 负责 hard eligibility，Node 14 负责单道 Recipe 的透明 scoring/
 - food-safety coverage 或 expiry penalty
 - global optimization、beam search 或 backtracking
 - diversity/repetition penalty 与 MealType suitability
-- Inventory reservation/consumption 或 shopping price optimization
+- Shopping persistence、purchase/order workflow 或 package/price optimization
+- Inventory reservation/consumption
+- food-safety expiry policy
 - COMPLETED workflow
-- Node 16
+- Node 17
 
 Node 11 Planning Preferences 是历史节点，不代表当前状态。
 
@@ -59,6 +64,7 @@ V1 不引入 Redis、消息队列、LLM 或 Agent。
 - [Deterministic Recipe Candidate Filtering](docs/decisions/0018-deterministic-recipe-candidate-filtering.md)
 - [Deterministic Candidate Scoring and Ranking](docs/decisions/0019-deterministic-candidate-scoring-and-ranking.md)
 - [Deterministic Multi-Meal Plan Construction](docs/decisions/0020-deterministic-multi-meal-plan-construction.md)
+- [Plan-Derived Shopping Preview](docs/decisions/0021-plan-derived-shopping-preview.md)
 - [Planning Preferences Profile](docs/decisions/0016-planning-preferences-profile.md)
 - [项目规则](AGENTS.md)
 
