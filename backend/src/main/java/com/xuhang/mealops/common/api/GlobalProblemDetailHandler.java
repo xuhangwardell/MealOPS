@@ -31,6 +31,7 @@ import com.xuhang.mealops.mealplan.application.MealPlanNotFoundException;
 import com.xuhang.mealops.mealplan.application.MealPlanStateConflictException;
 import com.xuhang.mealops.mealplan.application.MealPlanIncompleteException;
 import com.xuhang.mealops.mealplan.application.MealPlanNoEligibleRecipeException;
+import com.xuhang.mealops.mealplan.application.MealPlanSlotNotFoundException;
 import com.xuhang.mealops.mealplan.domain.InvalidMealPlanException;
 import com.xuhang.mealops.planning.domain.InvalidMealPlanPlanningException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -75,6 +76,10 @@ public class GlobalProblemDetailHandler {
     @ExceptionHandler(MealPlanNotFoundException.class)
     ResponseEntity<ProblemDetail> mealPlanNotFound(MealPlanNotFoundException exception, HttpServletRequest request) {
         return problem(HttpStatus.NOT_FOUND, "Meal plan not found", exception.getMessage(), "MEAL_PLAN_NOT_FOUND", request);
+    }
+    @ExceptionHandler(MealPlanSlotNotFoundException.class)
+    ResponseEntity<ProblemDetail> mealPlanSlotNotFound(MealPlanSlotNotFoundException exception, HttpServletRequest request) {
+        return problem(HttpStatus.NOT_FOUND, "Meal plan slot not found", exception.getMessage(), "MEAL_PLAN_SLOT_NOT_FOUND", request);
     }
     @ExceptionHandler(MealPlanStateConflictException.class)
     ResponseEntity<ProblemDetail> mealPlanConflict(MealPlanStateConflictException exception, HttpServletRequest request) {

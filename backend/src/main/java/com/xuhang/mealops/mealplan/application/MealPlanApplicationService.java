@@ -18,12 +18,12 @@ public class MealPlanApplicationService {
         validateRecipes(schedule); try { return repository.replaceDraft(id,schedule); } catch (MealPlanStateConflictException e){throw e;}
     }
     @Transactional public MealPlan confirm(long id){
-        MealPlan current=get(id); if(current.status()!=MealPlanStatus.DRAFT) throw new MealPlanStateConflictException("Meal plan state conflict");
+        MealPlan current=repository.findByIdForUpdate(id).orElseThrow(()->new MealPlanNotFoundException(id)); if(current.status()!=MealPlanStatus.DRAFT) throw new MealPlanStateConflictException("Meal plan state conflict");
         if(current.schedule().slots().stream().anyMatch(s->s.recipeSelection()==null)) throw new MealPlanIncompleteException();
         return repository.confirmDraftIfComplete(id);
     }
     @Transactional public MealPlan cancel(long id){
-        MealPlan current=get(id); if(current.status()==MealPlanStatus.CANCELLED) throw new MealPlanStateConflictException("Meal plan state conflict");
+        MealPlan current=repository.findByIdForUpdate(id).orElseThrow(()->new MealPlanNotFoundException(id)); if(current.status()==MealPlanStatus.CANCELLED||current.status()==MealPlanStatus.COMPLETED) throw new MealPlanStateConflictException("Meal plan state conflict");
         return repository.cancelActive(id);
     }
     private void validateRecipes(MealPlanSchedule schedule){

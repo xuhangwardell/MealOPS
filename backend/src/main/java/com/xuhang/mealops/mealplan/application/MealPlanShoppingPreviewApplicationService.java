@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.xuhang.mealops.inventory.application.InventoryBatchRepository;
 import com.xuhang.mealops.mealplan.domain.MealPlan;
 import com.xuhang.mealops.mealplan.domain.MealPlanStatus;
+import com.xuhang.mealops.mealplan.domain.MealSlotExecutionStatus;
 import com.xuhang.mealops.recipe.application.RecipeRepository;
 import com.xuhang.mealops.recipe.domain.Recipe;
 import com.xuhang.mealops.recipe.domain.RecipeScaler;
@@ -40,18 +41,23 @@ public class MealPlanShoppingPreviewApplicationService {
         MealPlan mealPlan = mealPlans.findById(mealPlanId)
                 .orElseThrow(() -> new MealPlanNotFoundException(mealPlanId));
         validatePreviewable(mealPlan);
+        if (mealPlan.status() == MealPlanStatus.COMPLETED) return new ShoppingListPreview(List.of());
 
         Map<Long, Recipe> recipesById = indexRecipes(recipes.findAll());
         Map<ScalingKey, ScaledRecipe> scaledCache = new HashMap<>();
         List<ScaledRecipe> slotContributions = new ArrayList<>();
-        mealPlan.schedule().slots().forEach(slot -> {
+        mealPlan.schedule().slots().stream()
+                .filter(slot -> slot.executionStatus() == MealSlotExecutionStatus.PENDING)
+                .forEach(slot -> {
             var selection = slot.recipeSelection();
             ScalingKey key = new ScalingKey(selection.recipeId(), selection.targetServings());
             ScaledRecipe scaled = scaledCache.computeIfAbsent(key,
                     ignored -> scaler.scale(requireRecipe(recipesById, selection.recipeId()),
                             selection.targetServings()));
             slotContributions.add(scaled);
-        });
+                });
+
+        if (slotContributions.isEmpty()) return new ShoppingListPreview(List.of());
 
         var wholePlanRequirements = aggregator.aggregate(slotContributions);
         return calculator.calculate(wholePlanRequirements, inventory.findAvailable());

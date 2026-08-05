@@ -2,45 +2,36 @@
 
 ## Current Status
 
-Node 16 Plan-Derived Shopping Preview implemented / under review.
+Node 17 Transactional Meal-Slot Completion & Inventory Consumption implemented / under review.
 
-Node 15 生成并持久化完整但尚未确认的 DRAFT MealPlan。Node 16 读取该持久化计划中的 Recipe selections 和各自 stored `targetServings`，先聚合整份计划的食材需求，再与请求时的 current accounting Inventory 比较，生成 live、derived、read-only 的 Shopping Preview。Planning Preferences 后续变化不会改写既有计划的购物需求。
+Node 17 将已确认计划中的单个餐槽完成动作与库存消费放在同一数据库事务中：使用持久化的 Recipe selection 与 `targetServings` 计算食材需求，按确定顺序复用 FEFO、乐观 CAS 与 `CONSUME` 库存流水。重复完成同一餐槽是无副作用的成功响应；最后一个餐槽完成后 MealPlan 进入 `COMPLETED`。
 
 已实现：
 
-- persistent MealPlan
-- explicit Meal Slots
-- manual Recipe assignment
-- DRAFT full replacement
-- confirm / cancel lifecycle
-- pure hard-constraint Recipe filtering
-- recipeId ASC deterministic candidate representation
-- accounting inventory coverage scorecard
-- coverage DESC / shortage count ASC / cooking time ASC / recipeId ASC ranking
-- deterministic greedy multi-meal construction
-- rolling in-memory accounting inventory simulation
-- complete DRAFT MealPlan persistence and explicit confirm lifecycle
-- persisted MealPlan-derived whole-plan requirement aggregation
-- live current-inventory shopping shortage preview
-- complete DRAFT and CONFIRMED preview support
+- persistent MealPlan 与显式 Meal Slots
+- DRAFT 全量替换、确认与取消生命周期
+- deterministic Recipe filtering、scoring、ranking 与多餐构建
+- persisted MealPlan-derived Shopping Preview
+- per-slot `PENDING` / `COMPLETED` execution status
+- transactional meal-slot completion
+- multi-ingredient FEFO inventory consumption 与不可缺失流水
+- same-plan row locking 与重复完成幂等
+- pending-slot-only Shopping Preview；COMPLETED 计划返回空预览
 
 尚未实现：
 
-- opaque `totalScore` 或 arbitrary weights（明确不使用）
-- food-safety coverage 或 expiry penalty
-- global optimization、beam search 或 backtracking
-- diversity/repetition penalty 与 MealType suitability
-- Shopping persistence、purchase/order workflow 或 package/price optimization
-- Inventory reservation/consumption
+- Inventory reservation 或 consume-on-confirm
+- completion undo、reversal 或负向库存流水
+- ADJUST、RECEIVE、DISCARD
+- execution history table
+- price、budget、purchase/order workflow
 - food-safety expiry policy
-- COMPLETED workflow
-- Node 17
-
-Node 11 Planning Preferences 是历史节点，不代表当前状态。
+- Agent / AI、Redis、MQ
+- Node 18
 
 ## Architecture Baseline
 
-Java 21、Spring Boot 4.1.x、Spring MVC、Maven、PostgreSQL 18、Flyway、MyBatis-Plus Boot 4、REST/JSON、RFC 9457 Problem Details、JUnit Jupiter 6、AssertJ 和 Testcontainers PostgreSQL。
+Java 21、Spring Boot 4.1.x、Spring MVC、Maven、PostgreSQL 18、Flyway、MyBatis-Plus Boot 4、REST/JSON、RFC 9457 Problem Details、JUnit Jupiter 6、AssertJ 与 Testcontainers PostgreSQL。
 
 V1 不引入 Redis、消息队列、LLM 或 Agent。
 
@@ -49,10 +40,10 @@ V1 不引入 Redis、消息队列、LLM 或 Agent。
 1. 维护标准食材和结构化菜谱；
 2. 记录库存批次及保质期；
 3. 输入未来 1～3 天的用餐需求；
-4. 生成餐食计划候选；
-5. 聚合食材需求并抵扣库存；
-6. 生成购物清单；
-7. 确认做饭结果并更新状态。
+4. 生成确定性多餐计划；
+5. 聚合计划需求并预览购物缺口；
+6. 用户确认计划并逐餐完成；
+7. 完成餐槽时原子扣减库存并记录流水。
 
 ## Documentation
 
@@ -65,6 +56,7 @@ V1 不引入 Redis、消息队列、LLM 或 Agent。
 - [Deterministic Candidate Scoring and Ranking](docs/decisions/0019-deterministic-candidate-scoring-and-ranking.md)
 - [Deterministic Multi-Meal Plan Construction](docs/decisions/0020-deterministic-multi-meal-plan-construction.md)
 - [Plan-Derived Shopping Preview](docs/decisions/0021-plan-derived-shopping-preview.md)
+- [Transactional Meal-Slot Completion](docs/decisions/0022-transactional-meal-slot-completion.md)
 - [Planning Preferences Profile](docs/decisions/0016-planning-preferences-profile.md)
 - [项目规则](AGENTS.md)
 

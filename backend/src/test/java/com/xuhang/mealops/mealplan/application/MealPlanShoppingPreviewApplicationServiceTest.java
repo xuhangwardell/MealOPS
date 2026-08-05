@@ -21,6 +21,7 @@ import com.xuhang.mealops.mealplan.domain.MealPlanSchedule;
 import com.xuhang.mealops.mealplan.domain.MealPlanStatus;
 import com.xuhang.mealops.mealplan.domain.MealSlot;
 import com.xuhang.mealops.mealplan.domain.MealType;
+import com.xuhang.mealops.mealplan.domain.MealSlotExecutionStatus;
 import com.xuhang.mealops.measurement.domain.Quantity;
 import com.xuhang.mealops.measurement.domain.Unit;
 import com.xuhang.mealops.recipe.application.RecipeRepository;
@@ -71,6 +72,21 @@ class MealPlanShoppingPreviewApplicationServiceTest {
         when(mealPlans.findById(33)).thenReturn(Optional.of(cancelled));
         assertThatThrownBy(() -> service.preview(33)).isInstanceOf(MealPlanStateConflictException.class);
         verifyNoInteractions(recipes, inventory);
+    }
+
+    @Test
+    void confirmedPreviewIncludesOnlyPendingSlotsAndCompletedPlanIsEmpty() {
+        Recipe recipe = recipe(11, 1, "100");
+        MealSlot completed = new MealSlot(LocalDate.of(2026, 8, 6), MealType.LUNCH,
+                new MealPlanRecipeSelection(11, 1), MealSlotExecutionStatus.COMPLETED);
+        MealSlot pending = selection(MealType.DINNER, 11, 1);
+        when(mealPlans.findById(41)).thenReturn(Optional.of(plan(41, MealPlanStatus.CONFIRMED, completed, pending)));
+        when(recipes.findAll()).thenReturn(List.of(recipe)); when(inventory.findAvailable()).thenReturn(List.of());
+        assertThat(service.preview(41).items()).singleElement().satisfies(item ->
+                assertThat(item.requiredQuantity().amount()).isEqualByComparingTo("100"));
+
+        when(mealPlans.findById(42)).thenReturn(Optional.of(plan(42, MealPlanStatus.COMPLETED, completed)));
+        assertThat(service.preview(42).items()).isEmpty();
     }
 
     private MealSlot selection(MealType mealType, long recipeId, int targetServings) {
