@@ -2,12 +2,14 @@
 
 ## Current Status
 
-Node 19 Foundational Domain Frontend Slices implemented / under review.
+Node 20 Contract Gate prerequisite: Backend MealPlan Rediscovery Contract implemented / under review.
+
+Node 20 前端仍未开始；本前置节点仅提供刷新和重新进入 Plans 页面所需的 `GET /api/v1/meal-plans/latest`，不实现前端规划与执行流程。
 
 当前真实前端链路为：Ingredient → Inventory → Recipe → Planning Preferences。
 Backend Catalog Read APIs 已在 `11b0ca8` 提供 `GET /api/v1/ingredients` 与 `GET /api/v1/recipes`。
 
-Node 19 前端只实现基础领域页面，不代表 V1 前端完整。Node 20 尚未开始，仍未实现 MealPlan generation、Shopping Preview、Confirm、Cancel 或 Slot completion UI。
+Node 19 前端只实现基础领域页面，不代表 V1 前端完整。Node 20 前端尚未开始，MealPlan generation、Shopping Preview、Confirm、Cancel 或 Slot completion UI 仍未实现；当前仅完成其后端 rediscovery 前置契约。
 
 ## Architecture Baseline
 
@@ -31,6 +33,7 @@ Inventory / Recipe / Planning Preferences → page-local state
 - [Frontend Engineering Baseline](docs/decisions/0023-frontend-engineering-baseline.md)
 - [Backend Catalog Read APIs](docs/decisions/0024-backend-catalog-read-apis.md)
 - [Foundational Domain Frontend Slices](docs/decisions/0025-foundational-domain-frontend-slices.md)
+- [Backend MealPlan Rediscovery Contract](docs/decisions/0026-backend-meal-plan-rediscovery-contract.md)
 
 ## Local Development
 

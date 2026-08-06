@@ -2,7 +2,7 @@
 
 ## 文档目的
 
-本文档同步至 Node 19 Foundational Domain Frontend Slices，记录当前前后端模块边界、依赖方向与运行关系。
+本文档同步至 Node 20 前置节点：Backend MealPlan Rediscovery Contract，记录当前前后端模块边界、依赖方向与运行关系。
 
 ## 当前能力与边界
 
@@ -18,7 +18,27 @@ Structured recipes
 Planning Preferences
 ```
 
-这些页面通过现有 REST API 读写服务器状态，不实现业务计算。Node 20 的 MealPlan generation、Shopping Preview、Confirm、Cancel、Slot completion UI 尚未实现。
+这些页面通过现有 REST API 读写服务器状态，不实现业务计算。Node 20 前端的 MealPlan generation、Shopping Preview、Confirm、Cancel、Slot completion UI 尚未实现；本前置节点仅补充后端 latest rediscovery contract。
+
+## MealPlan Rediscovery
+
+本文档同步至 Node 20 前置节点：Backend MealPlan Rediscovery Contract。
+
+```text
+Plans refresh / re-entry
+        ↓
+GET /api/v1/meal-plans/latest
+        ↓
+MealPlan Application Service
+        ↓
+MealPlan Repository findLatest
+        ↓
+PostgreSQL
+        ↓
+Full MealPlan aggregate
+```
+
+该能力由后端负责 server-side rediscovery：按数据库 identity ID 的创建顺序选择最新计划，并复用完整 aggregate 装配。没有计划时返回 204。前端不持久化 planId；本前置节点不实现 Node 20 Planning & Execution 前端、历史列表、分页、搜索或认证语义。
 
 ## Frontend 分层
 

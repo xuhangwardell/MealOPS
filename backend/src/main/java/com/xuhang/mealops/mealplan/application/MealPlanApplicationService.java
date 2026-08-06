@@ -13,6 +13,7 @@ public class MealPlanApplicationService {
     public MealPlanApplicationService(MealPlanRepository repository, RecipeRepository recipes){this.repository=repository;this.recipes=recipes;}
     @Transactional public MealPlan create(MealPlanSchedule schedule){ validateRecipes(schedule); return repository.create(schedule); }
     @Transactional(readOnly=true) public MealPlan get(long id){ return repository.findById(id).orElseThrow(()->new MealPlanNotFoundException(id)); }
+    @Transactional(readOnly=true) public java.util.Optional<MealPlan> getLatest(){ return repository.findLatest(); }
     @Transactional public MealPlan replace(long id, MealPlanSchedule schedule){
         MealPlan current=get(id); if(current.status()!=MealPlanStatus.DRAFT) throw new MealPlanStateConflictException("Meal plan is not editable");
         validateRecipes(schedule); try { return repository.replaceDraft(id,schedule); } catch (MealPlanStateConflictException e){throw e;}

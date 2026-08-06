@@ -9,6 +9,7 @@ import com.xuhang.mealops.mealplan.domain.MealType;
 public interface MealPlanRepository {
     MealPlan create(MealPlanSchedule schedule);
     Optional<MealPlan> findById(long id);
+    Optional<MealPlan> findLatest();
     Optional<MealPlan> findByIdForUpdate(long id);
     MealPlan replaceDraft(long id, MealPlanSchedule schedule);
     MealPlan confirmDraftIfComplete(long id);
