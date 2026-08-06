@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.Collection;
 import java.util.Set;
+import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
@@ -38,6 +39,11 @@ public class MyBatisIngredientRepository implements IngredientRepository {
     @Override
     public Optional<Ingredient> findById(Long id) {
         return Optional.ofNullable(mapper.selectById(id)).map(this::toDomain);
+    }
+
+    @Override
+    public List<Ingredient> findAll() {
+        return mapper.findAllIngredients().stream().map(this::toDomain).toList();
     }
 
     @Override

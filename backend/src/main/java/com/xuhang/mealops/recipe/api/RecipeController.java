@@ -1,6 +1,7 @@
 package com.xuhang.mealops.recipe.api;
 
 import java.net.URI;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -28,6 +29,11 @@ public class RecipeController {
     }
     @GetMapping("/{id}")
     public RecipeResponse get(@PathVariable Long id) { return RecipeResponse.from(service.get(id)); }
+
+    @GetMapping
+    public List<RecipeResponse> list() {
+        return service.findAll().stream().map(RecipeResponse::from).toList();
+    }
 
     @GetMapping("/{id}/scaled")
     @ApiResponse(responseCode = "200", description = "Scaled recipe")

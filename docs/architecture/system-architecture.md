@@ -87,6 +87,20 @@ Controller 只负责协议适配和输入转换；Application Service 负责用�
 - HTTP client 只负责 `uni.request`、URL/query、2xx/204 与 ProblemDetail/网络错误，不弹 Toast、不导航、不自动重试。
 - Backend 继续是所有业务状态与规则的事实来源。
 
+## Catalog 与规划读取边界
+
+```text
+Catalog Read APIs
+        ↓
+canonical Ingredient / Recipe state
+
+Candidate APIs
+        ↓
+planning-specific derived views
+```
+
+`GET /api/v1/ingredients` 和 `GET /api/v1/recipes` 只读取 canonical catalog；它们不读取 Inventory、Planning Preferences，也不调用过滤、评分、排序或 Planner。`/api/v1/recipe-candidates` 及其后续 ranking endpoint 属于规划语义，不能作为 Recipe CRUD catalog 的替代。
+
 一级导航由 `pages.json` 与 tabBar 定义，不引入 Vue Router。H5 开发代理只转发 `/api` 和 `/actuator`；微信小程序当前只保证编译兼容，真实合法域名与发布配置尚未确定。
 
 ## MealPlan 执行生命周期
@@ -120,4 +134,4 @@ Flyway 最新为 V7。V7 只为 `meal_plan_slot` 增加 execution status，并�
 
 ## 当前限制
 
-当前没有 Inventory reservation、consume-on-confirm、completion undo/reversal、execution history、价格或食品安全策略。前端尚未实现 Inventory、Recipe、Planning 或 execution 业务 UI，也没有 authentication 或微信发布配置。V1 仍不存在 Redis、MQ、LLM 或 Agent；Node 19 尚未开始。
+当前没有 Inventory reservation、consume-on-confirm、completion undo/reversal、execution history、价格或食品安全策略。Node 18 已建立前端基线；Node 19 frontend 尚未开始，当前 prerequisite 只补充 Ingredient/Recipe catalog read APIs。V1 仍不存在 Redis、MQ、LLM 或 Agent。

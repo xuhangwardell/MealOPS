@@ -1,5 +1,7 @@
 package com.xuhang.mealops.ingredient.api;
 
+import java.util.List;
+
 import jakarta.validation.Valid;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -37,6 +39,11 @@ public class IngredientController {
     @GetMapping("/{id}")
     public IngredientResponse get(@PathVariable Long id) {
         return IngredientResponse.from(service.getIngredient(id));
+    }
+
+    @GetMapping
+    public List<IngredientResponse> list() {
+        return service.listIngredients().stream().map(IngredientResponse::from).toList();
     }
 
     @PutMapping("/{id}")

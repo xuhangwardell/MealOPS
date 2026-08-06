@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -66,6 +67,20 @@ class IngredientPersistenceIT {
     @Test
     void renameReturnsEmptyForMissingIngredient() {
         assertThat(repository.rename(Long.MAX_VALUE, IngredientName.of("Missing rename"))).isEmpty();
+    }
+
+    @Test
+    void findAllReturnsIdAscendingIngredientsAndEmptyWhenCatalogIsEmpty() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        jdbcTemplate.update("delete from ingredient");
+        assertThat(repository.findAll()).isEmpty();
+
+        Ingredient first = repository.create(Ingredient.newIngredient(IngredientName.of("List A " + UUID.randomUUID())));
+        Ingredient second = repository.create(Ingredient.newIngredient(IngredientName.of("List B " + UUID.randomUUID())));
+
+        assertThat(repository.findAll()).extracting(Ingredient::id).containsExactly(first.id(), second.id());
+        assertThat(repository.findAll()).extracting(i -> i.name().displayValue())
+                .containsExactly(first.name().displayValue(), second.name().displayValue());
     }
 
     @Test

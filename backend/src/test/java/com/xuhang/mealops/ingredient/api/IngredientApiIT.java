@@ -9,6 +9,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 import java.util.UUID;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +67,43 @@ class IngredientApiIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.name").value(renamed));
+    }
+
+    @Test
+    void listsCanonicalIngredientsInIdOrderAndReflectsRename() throws Exception {
+        String suffix = UUID.randomUUID().toString();
+        mockMvc.perform(get("/api/v1/ingredients"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
+
+        MvcResult first = mockMvc.perform(post("/api/v1/ingredients")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\":\"Catalog A " + suffix + "\"}"))
+                .andExpect(status().isCreated()).andReturn();
+        Long firstId = ((Number) JsonPath.read(first.getResponse().getContentAsString(), "$.id")).longValue();
+        MvcResult second = mockMvc.perform(post("/api/v1/ingredients")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\":\"Catalog B " + suffix + "\"}"))
+                .andExpect(status().isCreated()).andReturn();
+        Long secondId = ((Number) JsonPath.read(second.getResponse().getContentAsString(), "$.id")).longValue();
+
+        mockMvc.perform(put("/api/v1/ingredients/{id}", firstId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\":\"Catalog A renamed " + suffix + "\"}"))
+                .andExpect(status().isOk());
+
+        MvcResult listed = mockMvc.perform(get("/api/v1/ingredients"))
+                .andExpect(status().isOk()).andReturn();
+        List<Map<String, Object>> items = JsonPath.parse(listed.getResponse().getContentAsString()).read("$");
+        assertThat(items).anySatisfy(item -> {
+            assertThat(((Number) item.get("id")).longValue()).isEqualTo(firstId);
+            assertThat(item.get("name")).isEqualTo("Catalog A renamed " + suffix);
+        });
+        assertThat(items).anySatisfy(item -> {
+            assertThat(((Number) item.get("id")).longValue()).isEqualTo(secondId);
+            assertThat(item.get("name")).isEqualTo("Catalog B " + suffix);
+        });
+        assertThat(items).extracting(item -> ((Number) item.get("id")).longValue()).isSorted();
     }
 
     @Test
@@ -147,6 +188,7 @@ class IngredientApiIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paths['/api/v1/ingredients'].post").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/ingredients'].post.responses['201']").exists())
+                .andExpect(jsonPath("$.paths['/api/v1/ingredients'].get.responses['200']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/ingredients/{id}'].get").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/ingredients/{id}'].put").exists());
     }

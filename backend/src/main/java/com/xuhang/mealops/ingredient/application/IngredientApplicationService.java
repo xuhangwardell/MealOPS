@@ -1,5 +1,7 @@
 package com.xuhang.mealops.ingredient.application;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,11 @@ public class IngredientApplicationService {
     @Transactional(readOnly = true)
     public Ingredient getIngredient(Long id) {
         return repository.findById(id).orElseThrow(() -> new IngredientNotFoundException(id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Ingredient> listIngredients() {
+        return repository.findAll();
     }
 
     @Transactional

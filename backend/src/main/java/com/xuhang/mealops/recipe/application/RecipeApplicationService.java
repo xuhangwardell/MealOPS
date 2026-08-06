@@ -50,6 +50,9 @@ public class RecipeApplicationService {
     @Transactional(readOnly = true)
     public Recipe get(Long id) { return recipes.findById(id).orElseThrow(() -> new RecipeNotFoundException(id)); }
 
+    @Transactional(readOnly = true)
+    public List<Recipe> findAll() { return recipes.findAll(); }
+
     public record CreateRecipeCommand(String name, int baseServings, int estimatedMinutes,
             List<CreateRecipeIngredientCommand> ingredients, List<String> steps) {
         public CreateRecipeCommand {
