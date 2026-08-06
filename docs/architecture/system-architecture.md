@@ -2,7 +2,7 @@
 
 ## 文档目的
 
-本文档同步至 Node 17：Transactional Meal-Slot Completion & Inventory Consumption，记录当前模块边界、依赖方向与运行关系。
+本文档同步至 Node 18：Frontend Engineering Baseline，记录当前前后端模块边界、依赖方向与运行关系。
 
 ## 当前能力链
 
@@ -32,7 +32,10 @@ Node 13～15 负责确定性的过滤、评分、排序和逐餐贪心构建。N
 
 ```mermaid
 flowchart TB
-  Client["uni-app H5 / Vue 3 / TypeScript / Pinia"]
+  Pages["uni-app Pages / presentation"]
+  Store["Pinia / cross-page application state"]
+  ApiModule["Typed API modules"]
+  Client["uni.request / ProblemDetail transport"]
   API["REST JSON /api/v1"]
   Backend["Spring Boot 4.1 / Java 21 / Spring MVC"]
   MealPlan["mealplan"]
@@ -41,7 +44,10 @@ flowchart TB
   Other["ingredient / planning / shopping"]
   DB[(PostgreSQL 18)]
   Flyway["Flyway V1 → V7"]
-  Client --> API --> Backend
+  Pages --> Store
+  Pages --> ApiModule
+  Store --> ApiModule
+  ApiModule --> Client --> API --> Backend
   Backend --> MealPlan
   MealPlan --> Recipe
   MealPlan --> Inventory
@@ -54,6 +60,34 @@ flowchart TB
 ```
 
 Controller 只负责协议适配和输入转换；Application Service 负责用例编排与事务；Domain 表达计划与餐槽状态不变量；Infrastructure 通过 MyBatis 与显式 SQL 实现端口。
+
+## Frontend 边界
+
+```text
+┌────────────────────────────┐
+│ uni-app Vue3 Frontend      │
+│                            │
+│ Pages                      │
+│   ↓                        │
+│ Pinia / Page State         │
+│   ↓                        │
+│ Typed API Modules          │
+│   ↓                        │
+│ uni.request HTTP Client    │
+└─────────────┬──────────────┘
+              │ REST / ProblemDetail
+┌─────────────▼──────────────┐
+│ Spring Boot Backend        │
+└────────────────────────────┘
+```
+
+- Page 负责用户交互与呈现，不直接实现传输协议。
+- Store 只保存跨页面应用状态，不提前集中承载未来领域数据。
+- API module 表达单个后端 endpoint contract；Node 18 只实现 system health。
+- HTTP client 只负责 `uni.request`、URL/query、2xx/204 与 ProblemDetail/网络错误，不弹 Toast、不导航、不自动重试。
+- Backend 继续是所有业务状态与规则的事实来源。
+
+一级导航由 `pages.json` 与 tabBar 定义，不引入 Vue Router。H5 开发代理只转发 `/api` 和 `/actuator`；微信小程序当前只保证编译兼容，真实合法域名与发布配置尚未确定。
 
 ## MealPlan 执行生命周期
 
@@ -86,4 +120,4 @@ Flyway 最新为 V7。V7 只为 `meal_plan_slot` 增加 execution status，并�
 
 ## 当前限制
 
-当前没有 Inventory reservation、consume-on-confirm、completion undo/reversal、execution history、价格或食品安全策略。V1 仍不存在 Redis、MQ、LLM 或 Agent；Node 18 尚未开始。
+当前没有 Inventory reservation、consume-on-confirm、completion undo/reversal、execution history、价格或食品安全策略。前端尚未实现 Inventory、Recipe、Planning 或 execution 业务 UI，也没有 authentication 或微信发布配置。V1 仍不存在 Redis、MQ、LLM 或 Agent；Node 19 尚未开始。
