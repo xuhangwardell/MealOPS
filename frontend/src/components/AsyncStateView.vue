@@ -33,37 +33,12 @@ withDefaults(defineProps<{
     retryable: false
 });
 
-defineEmits<{
-    retry: [];
-}>();
+defineEmits<{ retry: [] }>();
 </script>
 
 <style scoped lang="scss">
-.state {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: $space-sm;
-}
-
-.state-title {
-    font-size: $text-lg;
-    font-weight: 650;
-}
-
-.state-message {
-    color: $color-text-secondary;
-    font-size: $text-md;
-    line-height: 1.6;
-}
-
-.state-action {
-    min-height: 80rpx;
-    margin: $space-sm 0 0;
-    padding: 0 $space-lg;
-    border-radius: $radius-sm;
-    background: $color-primary;
-    color: #ffffff;
-    font-size: $text-md;
-}
+.state { display: flex; flex-direction: column; align-items: flex-start; gap: $space-sm; }
+.state-title { font-size: $text-lg; font-weight: 650; }
+.state-message { color: $color-text-secondary; font-size: $text-md; line-height: 1.6; }
+.state-action { min-height: 80rpx; margin: $space-sm 0 0; padding: 0 $space-lg; border-radius: $radius-sm; background: $color-primary; color: #fff; font-size: $text-md; }
 </style>

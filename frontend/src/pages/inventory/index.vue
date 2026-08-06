@@ -1,11 +1,38 @@
 <template>
-    <AppPage title="库存" subtitle="统一查看手头食材，为规划和购物计算提供依据。">
-        <AsyncStateView empty empty-title="库存页面正在准备中"
-                        empty-message="后续将在这里接入真实库存批次；当前不会展示模拟数据。" />
+    <AppPage title="库存" subtitle="管理标准食材与当前库存批次">
+        <view class="surface-card section">
+            <text class="section-title">食材目录</text>
+            <AsyncStateView :loading="ingredientStore.loading && !ingredientStore.loaded" :error="ingredientStore.error" :empty="ingredientStore.loaded && ingredientStore.items.length === 0" empty-title="暂无食材" empty-message="先创建一个标准食材" @retry="loadIngredients">
+                <view v-for="item in ingredientStore.items" :key="item.id" class="list-row"><text class="row-name">{{ item.name }}</text><button class="small-button" @click="beginRename(item.id, item.name)">重命名</button></view>
+            </AsyncStateView>
+            <input v-model="newIngredientName" class="field" placeholder="标准食材名称" :disabled="ingredientSubmitting">
+            <button class="primary-button" :disabled="ingredientSubmitting" @click="submitIngredient">{{ ingredientSubmitting ? "提交中…" : "新增食材" }}</button>
+            <view v-if="renameId !== null" class="subform"><text class="field-label">重命名：{{ renameOriginal }}</text><input v-model="renameName" class="field" placeholder="新的标准名称" :disabled="renameSubmitting"><view class="button-row"><button class="secondary-button" @click="cancelRename">取消</button><button class="primary-button" :disabled="renameSubmitting" @click="submitRename">保存</button></view></view>
+            <text v-if="ingredientFeedback" class="feedback">{{ ingredientFeedback }}</text>
+        </view>
+        <view class="surface-card section">
+            <text class="section-title">新增库存批次</text>
+            <picker :range="ingredientNames" @change="selectInventoryIngredient"><view class="picker-field">{{ selectedIngredientName || "选择食材" }}</view></picker>
+            <input v-model="inventoryForm.amount" class="field" type="digit" placeholder="数量，例如 0.10">
+            <picker :range="units" @change="selectUnit"><view class="picker-field">单位：{{ inventoryForm.unit }}</view></picker>
+            <input v-model="inventoryForm.expiresOn" class="field" placeholder="到期日 YYYY-MM-DD（可留空）">
+            <button class="primary-button" :disabled="inventorySubmitting" @click="submitInventory">{{ inventorySubmitting ? "提交中…" : "新增库存" }}</button><text v-if="inventoryFeedback" class="feedback">{{ inventoryFeedback }}</text>
+        </view>
+        <view class="surface-card section"><view class="section-heading"><text class="section-title">当前库存</text><button class="small-button" @click="loadInventory">刷新</button></view><AsyncStateView :loading="inventoryLoading" :error="inventoryError" :empty="!inventoryLoading && !inventoryError && batches.length === 0" empty-title="暂无库存批次" empty-message="新增库存后会显示在这里" @retry="loadInventory"><view v-for="batch in batches" :key="batch.id" class="list-row column-row"><text class="row-name">{{ ingredientName(batch.ingredientId) }}</text><text class="row-detail">{{ String(batch.amount) }} {{ batch.unit }} · {{ batch.expiresOn || "无到期日" }}</text></view></AsyncStateView></view>
     </AppPage>
 </template>
-
 <script setup lang="ts">
-import AppPage from "@/components/AppPage.vue";
-import AsyncStateView from "@/components/AsyncStateView.vue";
+import { computed, onMounted, reactive, ref } from "vue";
+import AppPage from "@/components/AppPage.vue"; import AsyncStateView from "@/components/AsyncStateView.vue";
+import { useIngredientStore } from "@/stores/ingredients"; import { createInventoryBatch, listInventoryBatches, type InventoryBatch, type InventoryUnit } from "@/api/inventory"; import { toInventoryRequest } from "@/forms/inventory-form";
+const ingredientStore = useIngredientStore(); const batches = ref<InventoryBatch[]>([]); const inventoryLoading = ref(false); const inventoryError = ref<string | null>(null); const newIngredientName = ref(""); const ingredientSubmitting = ref(false); const ingredientFeedback = ref(""); const renameId = ref<number | null>(null); const renameOriginal = ref(""); const renameName = ref(""); const renameSubmitting = ref(false); const inventorySubmitting = ref(false); const inventoryFeedback = ref(""); const units: InventoryUnit[] = ["g", "kg", "ml", "l", "piece"]; const inventoryForm = reactive({ ingredientId: null as number | null, amount: "", unit: "g" as InventoryUnit, expiresOn: "" }); const ingredientNames = computed(() => ingredientStore.items.map((item) => item.name)); const selectedIngredientName = computed(() => ingredientStore.items.find((item) => item.id === inventoryForm.ingredientId)?.name ?? "");
+function readable(error: unknown): string { return error instanceof Error ? error.message : "操作失败，请稍后重试"; } function ingredientName(id: number): string { return ingredientStore.items.find((item) => item.id === id)?.name ?? `食材 #${id}`; } async function loadIngredients(): Promise<void> { try { await ingredientStore.load(); } catch { /* state is shown by store */ } } async function loadInventory(): Promise<void> { inventoryLoading.value = true; inventoryError.value = null; try { batches.value = await listInventoryBatches(); } catch (e: unknown) { inventoryError.value = readable(e); } finally { inventoryLoading.value = false; } }
+function beginRename(id: number, name: string): void { renameId.value = id; renameOriginal.value = name; renameName.value = name; ingredientFeedback.value = ""; } function cancelRename(): void { renameId.value = null; renameName.value = ""; }
+async function submitIngredient(): Promise<void> { if (!newIngredientName.value.trim() || ingredientSubmitting.value) return; ingredientSubmitting.value = true; ingredientFeedback.value = ""; try { await ingredientStore.create(newIngredientName.value.trim()); newIngredientName.value = ""; ingredientFeedback.value = "食材已创建"; } catch (e: unknown) { ingredientFeedback.value = readable(e); } finally { ingredientSubmitting.value = false; } }
+async function submitRename(): Promise<void> { if (renameId.value === null || !renameName.value.trim() || renameSubmitting.value) return; renameSubmitting.value = true; ingredientFeedback.value = ""; try { await ingredientStore.rename(renameId.value, renameName.value.trim()); cancelRename(); ingredientFeedback.value = "名称已更新"; } catch (e: unknown) { ingredientFeedback.value = readable(e); } finally { renameSubmitting.value = false; } }
+async function submitInventory(): Promise<void> { if (inventorySubmitting.value) return; inventorySubmitting.value = true; inventoryFeedback.value = ""; try { await createInventoryBatch(toInventoryRequest(inventoryForm)); inventoryForm.amount = ""; inventoryForm.expiresOn = ""; inventoryFeedback.value = "库存已创建"; await loadInventory(); } catch (e: unknown) { inventoryFeedback.value = readable(e); } finally { inventorySubmitting.value = false; } }
+function selectInventoryIngredient(event: { detail: { value: number } }): void { inventoryForm.ingredientId = ingredientStore.items[event.detail.value]?.id ?? null; } function selectUnit(event: { detail: { value: number } }): void { inventoryForm.unit = units[event.detail.value] ?? "g"; } onMounted(() => { void loadIngredients(); void loadInventory(); });
 </script>
+<style scoped lang="scss">
+.section { display:flex; flex-direction:column; gap:$space-md; margin-bottom:$space-lg; } .section-heading,.button-row { display:flex; align-items:center; justify-content:space-between; gap:$space-sm; } .section-title { font-size:$text-lg; font-weight:650; } .list-row { display:flex; align-items:center; justify-content:space-between; gap:$space-md; padding:$space-sm 0; border-bottom:1rpx solid $color-border; } .column-row { align-items:flex-start; flex-direction:column; gap:2rpx; } .row-name { font-weight:600; overflow-wrap:anywhere; } .row-detail,.field-label { color:$color-text-secondary; font-size:$text-sm; } .field,.picker-field { width:100%; min-height:82rpx; padding:0 $space-md; border:2rpx solid $color-border; border-radius:$radius-sm; background:#fff; font-size:$text-md; line-height:82rpx; } .primary-button,.secondary-button,.small-button { min-height:76rpx; border-radius:$radius-sm; font-size:$text-md; } .primary-button { background:$color-primary; color:#fff; } .secondary-button,.small-button { background:$color-surface; color:$color-primary; border:2rpx solid $color-border; } .small-button { min-height:58rpx; padding:0 $space-sm; font-size:$text-sm; } .subform { display:flex; flex-direction:column; gap:$space-sm; padding-top:$space-sm; } .feedback { color:$color-text-secondary; line-height:1.5; overflow-wrap:anywhere; }
+</style>

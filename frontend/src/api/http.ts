@@ -3,13 +3,14 @@ import { ApiNetworkError, ApiProblemError, normalizeProblemDetail } from "./prob
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 type QueryPrimitive = string | number | boolean;
+export type RequestBody = string | object | ArrayBuffer;
 export type QueryValue = QueryPrimitive | readonly QueryPrimitive[] | undefined;
 
-export interface RequestOptions {
+export interface RequestOptions<TBody extends RequestBody = RequestBody> {
     method: HttpMethod;
     path: string;
     query?: Readonly<Record<string, QueryValue>>;
-    data?: string | Record<string, unknown> | ArrayBuffer;
+    data?: TBody;
     headers?: Readonly<Record<string, string>>;
     timeout?: number;
 }
@@ -37,10 +38,10 @@ function networkError(message: string): ApiNetworkError {
         timeout ? "timeout" : "network");
 }
 
-export function request<T>(options: RequestOptions): Promise<T> {
+export function request<TResponse, TBody extends RequestBody = RequestBody>(options: RequestOptions<TBody>): Promise<TResponse> {
     const environment = getFrontendEnvironment();
     const url = `${joinUrl(environment.apiBaseUrl, options.path)}${buildQuery(options.query)}`;
-    return new Promise<T>((resolve, reject) => {
+    return new Promise<TResponse>((resolve, reject) => {
         uni.request({
             url,
             method: options.method,
@@ -49,7 +50,7 @@ export function request<T>(options: RequestOptions): Promise<T> {
             timeout: options.timeout ?? environment.apiTimeoutMs,
             success(response) {
                 if (response.statusCode >= 200 && response.statusCode < 300) {
-                    resolve((response.statusCode === 204 ? undefined : response.data) as T);
+                    resolve((response.statusCode === 204 ? undefined : response.data) as TResponse);
                     return;
                 }
                 reject(new ApiProblemError(normalizeProblemDetail(response.data, response.statusCode)));
